@@ -152,9 +152,9 @@ class _SignupScreenStates extends State<SignupScreen> {
                             recognizer: TapGestureRecognizer()
                               ..onTap = () {
                                 // Handle "Sign Up" click
-                                // Navigator.push(
-                                //   context,
-                                //   MaterialPageRoute(builder: (context) => SignUpPage()),
+                                // Navigator.replaceRouteBelow(
+                                //   context,anchorRoute: MaterialPageRoute(builder: (context) => ),
+                                //   newRoute: MaterialPageRoute(builder: (context) => SignUpPage()),
                                 // );
                               },
                           )

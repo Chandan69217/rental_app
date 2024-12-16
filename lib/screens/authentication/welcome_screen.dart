@@ -51,7 +51,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   height: 70.ss,
                 ),
                 CustomButton(
-                  onTap: () => Navigator.of(context).push(
+                  onTap: () => Navigator.of(context).pushReplacement(
                       MaterialPageRoute(builder: (context) => LoginScreen())),
                   text: 'Log In',
                   backgroundColor: ColorTheme.Blue,
@@ -60,7 +60,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 SizedBox(
                   height: 12.ss,
                 ),
-                CustomButton(text: 'Sign In', onTap: ()=> Navigator.of(context).push(
+                CustomButton(text: 'Sign In', onTap: ()=> Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (context) => SignupScreen())),)
               ],
             ),

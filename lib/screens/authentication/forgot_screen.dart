@@ -56,7 +56,7 @@ class _ForgetScreenStates extends State<ForgetScreen>{
                     onTap: () {},
                     // => Navigator.of(context).push(
                     //   MaterialPageRoute(builder: (context) => LoginScreen())),
-                    text: 'Forget',
+                    text: 'Get Code',
                     foregroundColor: ColorTheme.Snow_white,
                     backgroundColor: ColorTheme.Blue,
                   ),
@@ -139,7 +139,7 @@ class _ForgetScreenStates extends State<ForgetScreen>{
                         style: Theme.of(context).textTheme.titleSmall,
                         children: [
                           TextSpan(
-                            text: 'Sing Up',
+                            text: 'Log In',
                             style: Theme.of(context).textTheme.titleSmall!.copyWith(
                                 color: ColorTheme.Blue,
                                 fontSize: 12.fss,

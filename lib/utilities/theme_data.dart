@@ -16,7 +16,12 @@ ThemeData themeData() {
           fontWeight: FontWeight.w500,
           color: ColorTheme.Gray,
           fontSize: 12.fss
-        )
+        ),
+        bodyMedium: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Montserrat',
+            color: Colors.black,
+            fontSize: 14.fss),
       ),
     buttonTheme: ButtonThemeData(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.ss))

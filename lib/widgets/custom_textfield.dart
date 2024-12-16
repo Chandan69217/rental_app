@@ -31,7 +31,7 @@ class CustomTextField extends StatelessWidget {
                 borderSide: BorderSide(color: ColorTheme.Gray, width: 2.ss)),
             focusedBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: ColorTheme.Gray, width: 2.ss)),
-            disabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: ColorTheme.Ghost_White) ),
+            disabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: ColorTheme.Gray) ),
             hintStyle: Theme.of(context)
                 .textTheme
                 .titleSmall!

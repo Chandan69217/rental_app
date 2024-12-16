@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:rental_app/screens/authentication/forgot_screen.dart';
+import 'package:rental_app/screens/authentication/signup_screen.dart';
+import 'package:rental_app/screens/dashboard.dart';
 import 'package:rental_app/widgets/custom_button.dart';
 import 'package:rental_app/widgets/custom_textfield.dart';
 import 'package:sizing/sizing.dart';
@@ -53,9 +55,8 @@ class _LoginScreenStates extends State<LoginScreen> {
                 height: 20.ss,
               ),
               CustomButton(
-                onTap: () {},
-                  // => Navigator.of(context).push(
-                  //   MaterialPageRoute(builder: (context) => LoginScreen())),
+                onTap: () => Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => Dashboard()),(route) => false,),
                 text: 'Log In',
                 foregroundColor: ColorTheme.Snow_white,
                 backgroundColor: ColorTheme.Blue,
@@ -161,10 +162,10 @@ class _LoginScreenStates extends State<LoginScreen> {
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             // Handle "Sign Up" click
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(builder: (context) => SignUpPage()),
-                            // );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => SignupScreen()),
+                            );
                           },
                       )
                     ]),

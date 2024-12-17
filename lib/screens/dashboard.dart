@@ -14,11 +14,18 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardStates extends State<Dashboard> {
   static int _currentIndex = 0;
-  static final List<Widget> _screens = [HomeScreen(),BookingScreen(),CalendarScreen(),ProfileScreen()];
+  final List<Widget> _screens = [];
 
   @override
   void initState() {
     super.initState();
+    _screens.addAll([HomeScreen(),BookingScreen(onBackPressed: _onBackPressed ,),CalendarScreen(),ProfileScreen()]);
+  }
+  
+  _onBackPressed(){
+    setState(() {
+      _currentIndex--;
+    });
   }
   @override
   Widget build(BuildContext context) {

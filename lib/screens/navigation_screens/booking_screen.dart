@@ -33,17 +33,19 @@ class _BookingScreenStates extends State<BookingScreen> {
               size: 18.ss,
             )),
       ),
-      body: ListView.builder(
-          itemCount: 12,
-          shrinkWrap: true,
-          itemBuilder: (context, index) {
-            return _ListTile(
-              image: 'assets/hotels_images/1.jpg',
-              title: 'Jmj Boys Hostels',
-              rating: 3.5,
-              desc: 'Kakaguda Karkhana',
-            );
-          }),
+      body: SafeArea(
+        child: ListView.builder(
+            itemCount: 12,
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              return _ListTile(
+                image: 'assets/hotels_images/1.jpg',
+                title: 'Jmj Boys Hostels',
+                rating: 3.5,
+                desc: 'Kakaguda Karkhana',
+              );
+            }),
+      ),
     );
   }
 }

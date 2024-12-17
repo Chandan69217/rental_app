@@ -214,7 +214,7 @@ class _HomeScreenStates extends State<HomeScreen> {
               Container(
                 width: MediaQuery.of(context).size.width,
                 padding:
-                    EdgeInsets.symmetric(horizontal: 12.ss, vertical: 18.ss),
+                    EdgeInsets.symmetric(vertical: 18.ss),
                 decoration: BoxDecoration(
                   shape: BoxShape.rectangle,
                   borderRadius: BorderRadius.circular(14.ss),
@@ -224,13 +224,18 @@ class _HomeScreenStates extends State<HomeScreen> {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      'Menu',
+                    Padding(
+                      padding: EdgeInsets.only(left:12.ss),
+                      child: const Text(
+                        'Menu',
+                      ),
                     ),
+                    SizedBox(height: 8.ss,),
                     GridView.count(
                       crossAxisCount: 4,
                       shrinkWrap: true,
-                      mainAxisSpacing: 12.ss,
+                      mainAxisSpacing: 14.ss,
+                      crossAxisSpacing: 14.ss,
                       padding: EdgeInsets.symmetric(vertical: 4.ss),
                       children: [
                         _MenuButton(iconPath: 'assets/icons/profile.webp',label: 'Profile',onTap: (){},),
@@ -263,26 +268,27 @@ class _MenuButton extends StatelessWidget{
   const _MenuButton({super.key,required this.label,required this.iconPath,this.onTap});
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12.ss),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          CircleAvatar(
-            backgroundColor: ColorTheme.Blue,
-            radius: 25,
-            child: Image.asset(
-              this.iconPath,
-              color: ColorTheme.Snow_white,
-              width: 28.ss,
-              height: 28.ss,),
+    return Column(
+      children: [
+        InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.all(Radius.circular(50.ss)),
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: CircleAvatar(
+              backgroundColor: ColorTheme.Blue,
+              radius: 25,
+              child: Image.asset(
+                iconPath,
+                color: ColorTheme.Snow_white,
+                width: 30.ss,
+                height: 30.ss,),
+            ),
           ),
-          const SizedBox(height: 3,),
-          Text(this.label,style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 12.fss),),
-        ],
-      ),
+        ),
+        // const SizedBox(height: 3,),
+        Expanded(child: Text(label,style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 12.fss),)),
+      ],
     );
   }
 }

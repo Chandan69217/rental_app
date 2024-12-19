@@ -25,6 +25,14 @@ ThemeData themeData() {
       ),
     buttonTheme: ButtonThemeData(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.ss))
+    ),
+    checkboxTheme: CheckboxThemeData(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      side: const BorderSide(
+            width: 1.8, color:Colors.black45,
+        ),
     )
   );
 }

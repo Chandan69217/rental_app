@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rental_app/screens/navigation_screens/fee_screen.dart';
 import 'package:rental_app/screens/navigation_screens/booking_screen.dart';
-import 'package:rental_app/screens/navigation_screens/calendar_screen.dart';
 import 'package:rental_app/screens/navigation_screens/home_screen.dart';
 import 'package:rental_app/screens/navigation_screens/profile_screen.dart';
 import 'package:rental_app/utilities/color_theme.dart';
@@ -19,7 +19,7 @@ class _DashboardStates extends State<Dashboard> {
   @override
   void initState() {
     super.initState();
-    _screens.addAll([HomeScreen(),BookingScreen(onBackPressed: _onBackPressed ,),CalendarScreen(),ProfileScreen()]);
+    _screens.addAll([HomeScreen(),BookingScreen(onBackPressed: _onBackPressed ,),FeeScreen(onBackPressed: _onBackPressed,),ProfileScreen(onBackPressed: _onBackPressed,)]);
   }
   
   _onBackPressed(){
@@ -48,14 +48,14 @@ class _DashboardStates extends State<Dashboard> {
         BottomNavigationBarItem(
             icon: Image.asset(
           'assets/icons/home_outline.webp',
-          width: 22.ss,
-          height: 22.ss,
+          width: 20.ss,
+          height: 20.ss,
           fit: BoxFit.cover,
               color: ColorTheme.Gray,
         ),activeIcon: Image.asset(
           'assets/icons/home_filled.webp',
-          width: 22.ss,
-          height: 22.ss,
+          width: 20.ss,
+          height: 20.ss,
           fit: BoxFit.cover,
           color: ColorTheme.Ghost_White,
         ),
@@ -77,30 +77,30 @@ class _DashboardStates extends State<Dashboard> {
         label: 'Booking'),
         BottomNavigationBarItem(
             icon: Image.asset(
-              'assets/icons/calendar_outline.webp',
-              width: 22.ss,
-              height: 22.ss,
+              'assets/icons/wallet_outlined.webp',
+              width: 24.ss,
+              height: 24.ss,
               fit: BoxFit.cover,
               color: ColorTheme.Gray,
             ),activeIcon: Image.asset(
-          'assets/icons/calendar_filled.webp',
-          width: 22.ss,
-          height: 22.ss,
+          'assets/icons/wallet_filled.webp',
+          width: 24.ss,
+          height: 24.ss,
           fit: BoxFit.cover,
           color: ColorTheme.Ghost_White,
         ),
-        label: 'Calendar'),
+        label: 'Fees'),
         BottomNavigationBarItem(
             icon: Image.asset(
               'assets/icons/profile_outline.webp',
-              width: 22.ss,
-              height: 22.ss,
+              width: 21.ss,
+              height: 21.ss,
               fit: BoxFit.cover,
               color: ColorTheme.Gray,
             ),activeIcon: Image.asset(
           'assets/icons/profile_filled.webp',
-          width: 22.ss,
-          height: 22.ss,
+          width: 21.ss,
+          height: 21.ss,
           fit: BoxFit.cover,
           color: ColorTheme.Ghost_White,
         ),

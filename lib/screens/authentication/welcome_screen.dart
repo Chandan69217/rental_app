@@ -20,53 +20,55 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-          child: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 32.ss,
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 32.ss,
+                  vertical: 50.ss
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Image.asset(
+                      'assets/icons/mobile_user_illustration.webp',
+                      width: 250.ss,
+                      height: 250.ss,
+                      fit: BoxFit.cover,
+                    ),
+                    Text(
+                      'Welcome',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 35.ss),
+                      child: Text(
+                        'Welcome to Rental App Your ultimate  companion for hassle-free hostel & PG bookings!',
+                        style: Theme.of(context).textTheme.titleSmall,
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 70.ss,
+                    ),
+                    CustomButton(
+                      onTap: () => Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(builder: (context) => LoginScreen())),
+                      text: 'Log In',
+                      backgroundColor: ColorTheme.Blue,
+                      foregroundColor: ColorTheme.Snow_white,
+                    ),
+                    SizedBox(
+                      height: 12.ss,
+                    ),
+                    CustomButton(text: 'Sign In', onTap: ()=> Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => SignupScreen())),)
+                  ],
+                ),
+              ),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'assets/icons/mobile_user_illustration.webp',
-                  width: 250.ss,
-                  height: 250.ss,
-                  fit: BoxFit.cover,
-                ),
-                Text(
-                  'Welcome',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 35.ss),
-                  child: Text(
-                    'Welcome to Rental App Your ultimate  companion for hassle-free hostel & PG bookings!',
-                    style: Theme.of(context).textTheme.titleSmall,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                SizedBox(
-                  height: 70.ss,
-                ),
-                CustomButton(
-                  onTap: () => Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (context) => LoginScreen())),
-                  text: 'Log In',
-                  backgroundColor: ColorTheme.Blue,
-                  foregroundColor: ColorTheme.Snow_white,
-                ),
-                SizedBox(
-                  height: 12.ss,
-                ),
-                CustomButton(text: 'Sign In', onTap: ()=> Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => SignupScreen())),)
-              ],
-            ),
-          ),
-        ),
-      )),
+          )),
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rental_app/custom_paints/circular_curve.dart';
+import 'package:rental_app/screens/menu/meal_screen.dart';
+import 'package:rental_app/screens/menu/notification_screen.dart';
 import 'package:rental_app/screens/navigation_screens/fee_screen.dart';
 import 'package:rental_app/screens/navigation_screens/profile_screen.dart';
 import 'package:sizing/sizing.dart';
@@ -256,7 +258,7 @@ class _HomeScreenStates extends State<HomeScreen> {
                         _MenuButton(
                           iconPath: 'assets/icons/food.webp',
                           label: 'Meal',
-                          onTap: () {},
+                          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context)=>MealScreen())),
                         ),
                         _MenuButton(
                           iconPath: 'assets/icons/attendant-list.webp',
@@ -266,7 +268,7 @@ class _HomeScreenStates extends State<HomeScreen> {
                         _MenuButton(
                           iconPath: 'assets/icons/notice.webp',
                           label: 'Notice',
-                          onTap: () {},
+                          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context)=>NotificationScreen())),
                         ),
                         _MenuButton(
                           iconPath: 'assets/icons/fee.webp',

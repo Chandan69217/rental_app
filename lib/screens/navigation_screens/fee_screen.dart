@@ -85,6 +85,7 @@ class _FeeScreenStates extends State<FeeScreen> {
                   Expanded(
                     child: SingleChildScrollView(
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Cheers! Your last fee is Paid.',
@@ -136,6 +137,7 @@ class _FeeScreenStates extends State<FeeScreen> {
                                   ListView.builder(
                                       itemCount: 2,
                                       shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
                                       itemBuilder: (context, index) {
                                         return _FeeExpansionTile(
                                             fees: _fees[index],

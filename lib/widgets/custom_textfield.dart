@@ -9,17 +9,20 @@ class CustomTextField extends StatelessWidget {
   final bool enable;
   final bool error;
   final FocusNode? focusNode;
+  final Widget? suffixIcon;
   final TextInputAction? textInputAction;
   final TextEditingController? controller;
 
   const CustomTextField(
-      {super.key, required this.keyboardType,
+      {super.key,
+      required this.keyboardType,
       required this.hintText,
       this.obscureText = false,
       this.enable = true,
       this.controller,
       this.focusNode,
       this.textInputAction,
+      this.suffixIcon,
       this.error = false});
   @override
   Widget build(BuildContext context) {
@@ -37,12 +40,19 @@ class CustomTextField extends StatelessWidget {
         decoration: InputDecoration(
             contentPadding: EdgeInsets.only(left: 8.ss, right: 8.ss),
             hintText: hintText,
+            suffix: suffixIcon,
             border: InputBorder.none,
             enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: error ? Colors.redAccent:ColorTheme.Gray, width: 2.ss)),
+                borderSide: BorderSide(
+                    color: error ? Colors.redAccent : ColorTheme.Gray,
+                    width: 2.ss)),
             focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: error ? Colors.redAccent:ColorTheme.Gray, width: 2.ss)),
-            disabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: error ? Colors.redAccent:ColorTheme.Gray) ),
+                borderSide: BorderSide(
+                    color: error ? Colors.redAccent : ColorTheme.Gray,
+                    width: 2.ss)),
+            disabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(
+                    color: error ? Colors.redAccent : ColorTheme.Gray)),
             hintStyle: Theme.of(context)
                 .textTheme
                 .titleSmall!

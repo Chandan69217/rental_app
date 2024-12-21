@@ -25,7 +25,7 @@ class CustomButton extends StatelessWidget{
                 BorderSide(width: 1.ss, color: ColorTheme.Blue),
                 borderRadius: BorderRadius.circular(10.ss)),
           ),
-          minimumSize: WidgetStatePropertyAll(Size(250.ss, 40.ss)),
+          minimumSize: WidgetStatePropertyAll(Size(MediaQuery.of(context).size.width, 40.ss)),
           backgroundColor:
           WidgetStatePropertyAll(backgroundColor),
           foregroundColor:

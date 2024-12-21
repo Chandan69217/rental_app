@@ -20,8 +20,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-          child: Align(
-            alignment: Alignment.center,
+          child: Center(
             child: SingleChildScrollView(
               child: Padding(
                 padding: EdgeInsets.symmetric(

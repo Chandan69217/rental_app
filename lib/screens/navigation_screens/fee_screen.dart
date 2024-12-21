@@ -55,7 +55,6 @@ class _FeeScreenStates extends State<FeeScreen> {
             )),
       ),
 
-
       body: SafeArea(
           child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -81,153 +80,91 @@ class _FeeScreenStates extends State<FeeScreen> {
                       topLeft: Radius.circular(35.ss),
                       topRight: Radius.circular(35.ss))),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Cheers! Your last fee is Paid.',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                  fontSize: 18.fss,
-                                ),
-                          ),
-                          SizedBox(
-                            height: 2.ss,
-                          ),
-                          Text(
-                            'You have paid 2781.67. you can pay more.',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall!
-                                .copyWith(fontSize: 14.fss),
-                          ),
-                          SizedBox(
-                            height: 20.ss,
-                          ),
-                          SizedBox(
-                              width: MediaQuery.of(context).size.width,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(left: 10.ss),
-                                    child: RichText(
-                                        text: TextSpan(
-                                            text: 'Payments',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium,
-                                            children: [
-                                          const TextSpan(text: '\n'),
-                                          TextSpan(
-                                              text: 'Select dues fee here',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .bodySmall)
-                                        ])),
-                                  ),
-                                  SizedBox(
-                                    height: 5.ss,
-                                  ),
-                                  ListView.builder(
-                                      itemCount: 2,
-                                      shrinkWrap: true,
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      itemBuilder: (context, index) {
-                                        return _FeeExpansionTile(
-                                            fees: _fees[index],
-                                            toggle:
-                                                _getSelection.contains(index),
-                                            onChanged: (value) {
-                                              _toggleSelection(index);
-                                            });
-                                      }),
-                                  SizedBox(
-                                    height: 10.ss,
-                                  ),
-                                  InkWell(
-                                    onTap: () {},
-                                    child: Card(
-                                        elevation: 2.ss,
-                                        child: ListTile(
-                                          leading: Image.asset(
-                                            'assets/icons/bill.webp',
-                                            width: 35.ss,
-                                            height: 35.ss,
-                                          ),
-                                          contentPadding: EdgeInsets.symmetric(
-                                            horizontal: 10.ss,
-                                          ),
-                                          title: Text(
-                                            'View All Bill',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium,
-                                          ),
-                                          trailing: const Icon(Icons
-                                              .keyboard_arrow_right_rounded),
-                                        )),
-                                  )
-                                ],
-                              )),
-                        ],
-                      ),
-                    ),
-                  ),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: 50,
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 2.ss, vertical: 5.ss),
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ButtonStyle(
-                            elevation: const WidgetStatePropertyAll(0),
-                            backgroundColor:
-                                const WidgetStatePropertyAll(ColorTheme.Blue),
-                            shape: WidgetStatePropertyAll(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(50.ss),
-                              ),
-                            )),
-                        child: Center(
-                          child: Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                Text('Pay ',
+                    padding: EdgeInsets.only(left: 10.ss,bottom: 5.ss),
+                    child: RichText(
+                        text: TextSpan(
+                            text: 'Payments',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium,
+                            children: [
+                              const TextSpan(text: '\n'),
+                              TextSpan(
+                                  text: 'Select dues payments',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodySmall)
+                            ])),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                        itemCount: 2,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          return _FeeExpansionTile(
+                              fees: _fees[index],
+                              toggle:
+                              _getSelection.contains(index),
+                              onChanged: (value) {
+                                _toggleSelection(index);
+                              });
+                        }),
+                  ),
+                  Visibility(
+                    visible: _totalAmount != 0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: 50,
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 2.ss, vertical: 5.ss),
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          style: ButtonStyle(
+                              elevation: const WidgetStatePropertyAll(0),
+                              backgroundColor:
+                                  const WidgetStatePropertyAll(ColorTheme.Blue),
+                              shape: WidgetStatePropertyAll(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(50.ss),
+                                ),
+                              )),
+                          child: Center(
+                            child: Expanded(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Text('Pay ',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(
+                                              color: ColorTheme.Snow_white,
+                                              fontSize: 14.fss)),
+                                  Image.asset(
+                                    'assets/icons/rupee-icon.webp',
+                                    width: 16.ss,
+                                    height: 16.ss,
+                                    fit: BoxFit.cover,
+                                    color: ColorTheme.Snow_white,
+                                  ),
+                                  Text(
+                                    '$_totalAmount',
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodyMedium!
                                         .copyWith(
-                                            color: ColorTheme.Snow_white,
-                                            fontSize: 14.fss)),
-                                Image.asset(
-                                  'assets/icons/rupee-icon.webp',
-                                  width: 16.ss,
-                                  height: 16.ss,
-                                  fit: BoxFit.cover,
-                                  color: ColorTheme.Snow_white,
-                                ),
-                                Text(
-                                  '$_totalAmount',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium!
-                                      .copyWith(
-                                          fontSize: 14.fss,
-                                          color: ColorTheme.Snow_white),
-                                ),
-                              ],
+                                            fontSize: 14.fss,
+                                            color: ColorTheme.Snow_white),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),

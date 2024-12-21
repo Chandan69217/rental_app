@@ -21,7 +21,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     return Scaffold(
       body: SafeArea(
           child: Align(
-            alignment: Alignment.bottomCenter,
+            alignment: Alignment.center,
             child: SingleChildScrollView(
               child: Padding(
                 padding: EdgeInsets.symmetric(

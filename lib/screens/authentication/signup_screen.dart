@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:rental_app/screens/authentication/login_screen.dart';
 import 'package:rental_app/widgets/custom_button.dart';
 import 'package:rental_app/widgets/custom_textfield.dart';
 import 'package:sizing/sizing.dart';
@@ -17,14 +18,14 @@ class _SignupScreenStates extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 32.ss,vertical: 10.ss),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.only(left: 32.ss,right:32.ss,top: 32.ss),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                     Image.asset(
                       'assets/icons/sign_up_illustration.webp',
                       width: 250.ss,
@@ -55,7 +56,7 @@ class _SignupScreenStates extends State<SignupScreen> {
                     CustomTextField(
                       keyboardType: TextInputType.visiblePassword,
                       hintText: 'Password',
-                      ObscureText: true,
+                      obscureText: true,
                     ),
                     SizedBox(
                       height: 20.ss,
@@ -136,36 +137,36 @@ class _SignupScreenStates extends State<SignupScreen> {
                         ],
                       ),
                     ),
-                    SizedBox(
-                      height: 8.ss,
-                    ),
-                    RichText(
-                      text: TextSpan(
-                          text: 'Already have an account ',
-                          style: Theme.of(context).textTheme.titleSmall,
-                          children: [
-                            TextSpan(
-                              text: 'Log In',
-                              style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                                  color: ColorTheme.Blue,
-                                  fontSize: 12.fss,
-                                  fontWeight: FontWeight.w600,
-                                  decoration: TextDecoration.underline),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  // Handle "Sign Up" click
-                                  // Navigator.replaceRouteBelow(
-                                  //   context,anchorRoute: MaterialPageRoute(builder: (context) => ),
-                                  //   newRoute: MaterialPageRoute(builder: (context) => SignUpPage()),
-                                  // );
-                                },
-                            )
-                          ]),
-                    )
-                  ],
+                  ],),
                 ),
               ),
-            ),
+
+              RichText(
+                text: TextSpan(
+                    text: 'Already have an account ',
+                    style: Theme.of(context).textTheme.titleSmall,
+                    children: [
+                      TextSpan(
+                        text: 'Log In',
+                        style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                            color: ColorTheme.Blue,
+                            fontSize: 12.fss,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.underline),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            // Handle "Sign Up" click
+                            if(Navigator.canPop(context)){
+                              Navigator.of(context).pop();
+                            }else{
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+                            }
+                          },
+                      )
+                    ]),
+              ),
+              SizedBox(height: 10.ss,)
+            ],
           )),
     );
   }

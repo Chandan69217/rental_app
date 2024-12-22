@@ -83,7 +83,7 @@ class _FeeScreenStates extends State<FeeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsets.only(left: 10.ss,bottom: 5.ss),
+                    padding: EdgeInsets.only(left: 5.ss),
                     child: RichText(
                         text: TextSpan(
                             text: 'Payments',
@@ -115,56 +115,50 @@ class _FeeScreenStates extends State<FeeScreen> {
                   ),
                   Visibility(
                     visible: _totalAmount != 0,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: 50,
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 2.ss, vertical: 5.ss),
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          style: ButtonStyle(
-                              elevation: const WidgetStatePropertyAll(0),
-                              backgroundColor:
-                                  const WidgetStatePropertyAll(ColorTheme.Blue),
-                              shape: WidgetStatePropertyAll(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(50.ss),
-                                ),
-                              )),
+                    child: Container(
+                      padding: EdgeInsets.all(10.ss,),
+                      width: MediaQuery.of(context).size.width,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Your onPressed logic here
+                        },
+                        style: ButtonStyle(
+                          elevation: const WidgetStatePropertyAll(0),
+                          backgroundColor: const WidgetStatePropertyAll(ColorTheme.Blue),
+                          shape: WidgetStatePropertyAll(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50.ss),
+                          ),)
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical:  14.ss),
                           child: Center(
-                            child: Expanded(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Text('Pay ',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium!
-                                          .copyWith(
-                                              color: ColorTheme.Snow_white,
-                                              fontSize: 14.fss)),
-                                  Image.asset(
-                                    'assets/icons/rupee-icon.webp',
-                                    width: 16.ss,
-                                    height: 16.ss,
-                                    fit: BoxFit.cover,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Text(
+                                  'Pay ',
+                                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                    color: ColorTheme.Snow_white,
+                                    fontSize: 14.fss,
+                                  ),
+                                ),
+                                Image.asset(
+                                  'assets/icons/rupee-icon.webp',
+                                  width: 16.ss,
+                                  height: 16.ss,
+                                  fit: BoxFit.cover,
+                                  color: ColorTheme.Snow_white,
+                                ),
+                                Text(
+                                  '$_totalAmount',
+                                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                    fontSize: 14.fss,
                                     color: ColorTheme.Snow_white,
                                   ),
-                                  Text(
-                                    '$_totalAmount',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium!
-                                        .copyWith(
-                                            fontSize: 14.fss,
-                                            color: ColorTheme.Snow_white),
-                                  ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ),
                         ),

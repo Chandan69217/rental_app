@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rental_app/model/consts.dart';
+import 'package:rental_app/screens/authentication/welcome_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
 
 import '../../utilities/color_theme.dart';
@@ -93,7 +96,13 @@ class _ProfileScreenStates extends State<ProfileScreen> {
                                 _profileButtons(iconPath: 'assets/icons/terms-and-conditions.webp', label: 'Terms & Conditions',onTap: (){},),
                                 _profileButtons(iconPath: 'assets/icons/privacy-policy.webp', label: 'Privacy Police',onTap: (){},),
                                 ListTile(
-                                  onTap: (){},
+                                  onTap: ()async{
+                                    var pref = await SharedPreferences.getInstance();
+                                    if(pref.containsKey(Consts.IS_LOGIN)){
+                                      pref.remove(Consts.IS_LOGIN);
+                                      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> const WelcomeScreen()),(route)=>false);
+                                    }
+                                  },
                                   title: Text('Log Out',style: Theme.of(context).textTheme.titleSmall!.copyWith(color: ColorTheme.Blue,fontSize: 14.fss,fontWeight: FontWeight.w500),),
                                   contentPadding: EdgeInsets.symmetric(horizontal: 12.ss),
                                 ),

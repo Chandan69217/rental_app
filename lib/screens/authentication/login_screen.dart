@@ -30,6 +30,7 @@ class _LoginScreenStates extends State<LoginScreen>
   final FocusNode _mobileFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
   bool _obscureText = true;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -108,6 +109,7 @@ class _LoginScreenStates extends State<LoginScreen>
                       height: 20.ss,
                     ),
                     CustomButton(
+                      isLoading: _isLoading,
                       onTap: _login,
                       text: 'Log In',
                       foregroundColor: ColorTheme.Snow_white,
@@ -226,6 +228,9 @@ class _LoginScreenStates extends State<LoginScreen>
   }
 
   void _login() async {
+    setState(() {
+      _isLoading = true;
+    });
     final String mobileTxt = _mobileTxtController.text.trim();
     final String passwordTxt = _passwordController.text.trim();
 
@@ -254,12 +259,14 @@ class _LoginScreenStates extends State<LoginScreen>
           _mobileTxtController.clear();
           _mobileFocusNode.requestFocus();
           _mobileTxtError = true;
+          _isLoading = false;
         });
       } else {
         setState(() {
           _passwordController.clear();
           _passwordFocusNode.requestFocus();
           _passwordTxtError = true;
+          _isLoading = false;
         });
       }
     }

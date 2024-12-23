@@ -52,7 +52,23 @@ class _HomeScreenStates extends State<HomeScreen> {
             )
           ],
         ),
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.more_vert))],
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: 16.ss),
+            child: InkWell(
+                borderRadius: BorderRadius.circular(20.ss),
+                overlayColor:
+                    WidgetStatePropertyAll(ColorTheme.Blue.withOpacity(0.1)),
+                onTap: () {},
+                child: Padding(
+                  padding: EdgeInsets.all(8.ss),
+                  child: Badge(
+                    child: Icon(Icons.notifications_none_rounded),
+                    label: Text('2'),
+                  ),
+                )),
+          )
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -76,7 +92,11 @@ class _HomeScreenStates extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(14.ss),
                     color: ColorTheme.Blue.withOpacity(0.95)),
                 child: CustomPaint(
-                  painter: CircularWave(waveColor: ColorTheme.Snow_white,waveHeight: 60,waveLength: 550,phaseShift: 1),
+                  painter: CircularWave(
+                      waveColor: ColorTheme.Snow_white,
+                      waveHeight: 60,
+                      waveLength: 550,
+                      phaseShift: 1),
                   child: Padding(
                     padding: EdgeInsets.all(24.ss),
                     child: Row(
@@ -120,7 +140,8 @@ class _HomeScreenStates extends State<HomeScreen> {
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleSmall!
-                                        .copyWith(color: ColorTheme.Ghost_White),
+                                        .copyWith(
+                                            color: ColorTheme.Ghost_White),
                                   ),
                                 ],
                               ),
@@ -143,7 +164,8 @@ class _HomeScreenStates extends State<HomeScreen> {
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleSmall!
-                                        .copyWith(color: ColorTheme.Ghost_White),
+                                        .copyWith(
+                                            color: ColorTheme.Ghost_White),
                                   ),
                                 ],
                               ),
@@ -247,18 +269,25 @@ class _HomeScreenStates extends State<HomeScreen> {
                       crossAxisCount: 4,
                       shrinkWrap: true,
                       mainAxisSpacing: 14.ss,
-                      crossAxisSpacing: 14.ss,
+                      crossAxisSpacing: 12.ss,
+                      physics: const NeverScrollableScrollPhysics(),
                       padding: EdgeInsets.symmetric(vertical: 4.ss),
                       children: [
                         _MenuButton(
                           iconPath: 'assets/icons/profile.webp',
                           label: 'Profile',
-                          onTap: ()=> Navigator.of(context).push(MaterialPageRoute(builder: (context)=>ProfileScreen(enableBack: true,))),
+                          onTap: () =>
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => ProfileScreen(
+                                        enableBack: true,
+                                      ))),
                         ),
                         _MenuButton(
                           iconPath: 'assets/icons/food.webp',
                           label: 'Meal',
-                          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context)=>MealScreen())),
+                          onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (context) => MealScreen())),
                         ),
                         _MenuButton(
                           iconPath: 'assets/icons/attendant-list.webp',
@@ -268,14 +297,18 @@ class _HomeScreenStates extends State<HomeScreen> {
                         _MenuButton(
                           iconPath: 'assets/icons/notice.webp',
                           label: 'Notice',
-                          onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context)=>NotificationScreen())),
+                          onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (context) => NotificationScreen())),
                         ),
                         _MenuButton(
                           iconPath: 'assets/icons/fee.webp',
                           label: 'Fee',
-                          onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (context) => FeeScreen(enableBack: true,))),
+                          onTap: () =>
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => FeeScreen(
+                                        enableBack: true,
+                                      ))),
                         ),
                         _MenuButton(
                           iconPath: 'assets/icons/reminder.webp',

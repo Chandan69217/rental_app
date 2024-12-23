@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:rental_app/utilities/color_theme.dart';
 import 'package:sizing/sizing.dart';
 
@@ -33,11 +34,31 @@ class _MealScreenStates extends State<MealScreen> {
         padding: EdgeInsets.symmetric(horizontal: 12.ss, vertical: 24),
         child: Column(
           children: [
-            _MealTile(onClick: (){},title: 'Breakfast',subTitle: 'get your breakfast between 8:00 AM to 11:00 AM',),
-            SizedBox(height: 18.ss,),
-            _MealTile(onClick: (){},title: 'Lunch',subTitle: 'get your lunch between 1:00 PM to 2:30 PM',enabled: false,),
-            SizedBox(height: 18.ss,),
-            _MealTile(onClick: (){},title: 'Dinner',subTitle: 'get your dinner between 8:00 PM to 10:00 PM',enabled: false,),
+            _MealTile(
+              onClick: () {
+                Navigator.of(context).push(MaterialPageRoute(builder: (context)=> _VisitScreen()));
+              },
+              title: 'Breakfast',
+              subTitle: 'get your breakfast between 8:00 AM to 11:00 AM',
+            ),
+            SizedBox(
+              height: 18.ss,
+            ),
+            _MealTile(
+              onClick: () {},
+              title: 'Lunch',
+              subTitle: 'get your lunch between 1:00 PM to 2:30 PM',
+              enabled: false,
+            ),
+            SizedBox(
+              height: 18.ss,
+            ),
+            _MealTile(
+              onClick: () {},
+              title: 'Dinner',
+              subTitle: 'get your dinner between 8:00 PM to 10:00 PM',
+              enabled: false,
+            ),
           ],
         ),
       ),
@@ -45,16 +66,13 @@ class _MealScreenStates extends State<MealScreen> {
   }
 }
 
-
-
-
-
-class _MealTile extends StatelessWidget{
+class _MealTile extends StatelessWidget {
   final bool enabled;
   final VoidCallback? onClick;
   final String title;
   final String subTitle;
-  _MealTile({this.enabled = true,this.onClick,this.title = '',this.subTitle = ''});
+  _MealTile(
+      {this.enabled = true, this.onClick, this.title = '', this.subTitle = ''});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -62,9 +80,7 @@ class _MealTile extends StatelessWidget{
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
           color: ColorTheme.Pole_Blue,
-          boxShadow: [
-            BoxShadow(color: Colors.black12, blurRadius: 8.ss)
-          ],
+          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 8.ss)],
           borderRadius: BorderRadius.all(Radius.circular(8.ss))),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -78,8 +94,7 @@ class _MealTile extends StatelessWidget{
                 children: [
                   TextSpan(text: '\n'),
                   TextSpan(
-                    text:
-                    subTitle,
+                    text: subTitle,
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ],
@@ -95,22 +110,54 @@ class _MealTile extends StatelessWidget{
               flex: 1,
               child: ElevatedButton(
                 child: const Text('Visit'),
-                onPressed: enabled ? onClick:null,
+                onPressed: enabled ? onClick : null,
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.ss),
                   ),
-                  foregroundColor: enabled ? ColorTheme.Snow_white : ColorTheme.Gray,
+                  foregroundColor:
+                      enabled ? ColorTheme.Snow_white : ColorTheme.Gray,
                   backgroundColor: enabled ? ColorTheme.Blue : Colors.black,
                 ),
-              )
-          )
+              ))
         ],
       ),
     );
   }
-
 }
+
+class _VisitScreen extends StatelessWidget{
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Breakfast'),backgroundColor: ColorTheme.Blue,foregroundColor: ColorTheme.Snow_white,leading: IconButton(onPressed: (){Navigator.of(context).pop();}, icon: Icon(Icons.keyboard_arrow_left_outlined)),),
+      body: SafeArea(
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              QrImageView(data: 'Hello World!',
+                version: QrVersions.auto,
+                size: MediaQuery.of(context).size.width * 0.7,
+              ),
+              // Expanded(child: Text('scan',style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Blue,fontWeight: FontWeight.bold,fontSize: 12.fss),))
+              Padding(
+                padding: EdgeInsets.only(bottom: 10.ss),
+                child: RichText(text: TextSpan(text: 'Chandan Sharma',style: Theme.of(context).textTheme.bodyMedium,children: [TextSpan(text: '\n'),TextSpan(children: [/* TextSpan(text: 'Building: 12A | Room No: 56'),TextSpan(text: '\n'),TextSpan(text: '23-dec-2024 10:00 am') */],style: Theme.of(context).textTheme.bodySmall!.copyWith(color: ColorTheme.Gray))])),
+              ),
+
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  
+}
+
 // class _FoodShowCase extends StatelessWidget{
 //   final List<String> picture;
 //   final String headline;

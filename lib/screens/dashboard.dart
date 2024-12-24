@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rental_app/screens/navigation_screens/attendance_screen.dart';
 import 'package:rental_app/screens/navigation_screens/fee_screen.dart';
 import 'package:rental_app/screens/navigation_screens/booking_screen.dart';
 import 'package:rental_app/screens/navigation_screens/home_screen.dart';
@@ -19,7 +20,7 @@ class _DashboardStates extends State<Dashboard> {
   @override
   void initState() {
     super.initState();
-    _screens.addAll([HomeScreen(),BookingScreen(onBackPressed: _onBackPressed ,),FeeScreen(onBackPressed: _onBackPressed,),ProfileScreen(onBackPressed: _onBackPressed,)]);
+    _screens.addAll([HomeScreen(),AttendanceScreen(onBackPressed: _onBackPressed ,),FeeScreen(onBackPressed: _onBackPressed,),ProfileScreen(onBackPressed: _onBackPressed,)]);
   }
   
   _onBackPressed(){
@@ -62,19 +63,19 @@ class _DashboardStates extends State<Dashboard> {
         label: 'Home',),
         BottomNavigationBarItem(
             icon: Image.asset(
-              'assets/icons/booking_outline.webp',
+              'assets/icons/attendance_outlined.webp',
               width: 22.ss,
               height: 22.ss,
               fit: BoxFit.cover,
               color: ColorTheme.Gray,
             ),activeIcon: Image.asset(
-          'assets/icons/booking_filled.webp',
+          'assets/icons/attendance_filled.webp',
           width: 22.ss,
           height: 22.ss,
           fit: BoxFit.cover,
           color: ColorTheme.Ghost_White,
         ),
-        label: 'Booking'),
+        label: 'Attendance'),
         BottomNavigationBarItem(
             icon: Image.asset(
               'assets/icons/wallet_outlined.webp',

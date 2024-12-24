@@ -22,11 +22,16 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return isLoading
-        ? const Center(
-            child: CircularProgressIndicator(
-              color: ColorTheme.Blue,
+        ? SizedBox(
+      width: 30.ss,
+          height: 30.ss,
+          child: Center(
+              child: CircularProgressIndicator(
+                color: ColorTheme.Blue,
+                strokeWidth: 3.ss,
+              ),
             ),
-          )
+        )
         : ElevatedButton(
             onPressed: onTap,
             style: ButtonStyle(

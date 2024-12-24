@@ -9,6 +9,7 @@ class CustomTextField extends StatelessWidget {
   final bool enable;
   final bool error;
   final FocusNode? focusNode;
+  final int? maxLine;
   final Widget? suffixIcon;
   final TextInputAction? textInputAction;
   final TextEditingController? controller;
@@ -22,6 +23,7 @@ class CustomTextField extends StatelessWidget {
       this.controller,
       this.focusNode,
       this.textInputAction,
+      this.maxLine,
       this.suffixIcon,
       this.error = false});
   @override
@@ -31,6 +33,7 @@ class CustomTextField extends StatelessWidget {
       child: TextField(
         controller: controller,
         enabled: enable,
+        maxLength: maxLine,
         focusNode: focusNode,
         textInputAction: textInputAction,
         cursorColor: ColorTheme.Blue,
@@ -42,6 +45,7 @@ class CustomTextField extends StatelessWidget {
             hintText: hintText,
             suffix: suffixIcon,
             border: InputBorder.none,
+            counterText: '',
             enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(
                     color: error ? Colors.redAccent : ColorTheme.Gray,

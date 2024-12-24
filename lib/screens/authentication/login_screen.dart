@@ -1,6 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart';
 import 'package:rental_app/model/consts.dart';
 import 'package:rental_app/model/dummy_json.dart';
 import 'package:rental_app/screens/authentication/forgot_screen.dart';
@@ -80,6 +85,7 @@ class _LoginScreenStates extends State<LoginScreen>
                       controller: _mobileTxtController,
                       keyboardType: TextInputType.number,
                       hintText: 'Mobile',
+                      maxLine: 10,
                       error: _mobileTxtError,
                       textInputAction: TextInputAction.next,
                       focusNode: _mobileFocusNode,
@@ -228,9 +234,6 @@ class _LoginScreenStates extends State<LoginScreen>
   }
 
   void _login() async {
-    setState(() {
-      _isLoading = true;
-    });
     final String mobileTxt = _mobileTxtController.text.trim();
     final String passwordTxt = _passwordController.text.trim();
 
@@ -242,34 +245,47 @@ class _LoginScreenStates extends State<LoginScreen>
       _passwordFocusNode.requestFocus();
       return;
     }
-    // here code for fetching response based on user inputs
-    String responseMobile = DummyJson.loginRequest[Consts.MOBILE];
-    String responsePassword = DummyJson.loginRequest[Consts.PASSWORD];
 
-    if (mobileTxt == responseMobile && passwordTxt == responsePassword) {
-      final pref = await SharedPreferences.getInstance();
-      pref.setBool(Consts.IS_LOGIN, true);
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => Dashboard()),
-        (route) => false,
-      );
-    } else {
-      if (mobileTxt != responseMobile) {
-        setState(() {
-          _mobileTxtController.clear();
-          _mobileFocusNode.requestFocus();
-          _mobileTxtError = true;
-          _isLoading = false;
-        });
-      } else {
-        setState(() {
-          _passwordController.clear();
-          _passwordFocusNode.requestFocus();
-          _passwordTxtError = true;
-          _isLoading = false;
-        });
-      }
+    if(mobileTxt.length < 10){
+      _mobileFocusNode.requestFocus();
+      Fluttertoast.showToast(msg: 'please enter valid mobile no');
+      return;
     }
+
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+      var uri = Uri.parse('https://appadmin.atharvaservices.com/api/LoginCheck/login');
+
+      var body = json.encode({
+        Consts.MOBILE: mobileTxt,
+        Consts.PASSWORD: passwordTxt,
+      });
+
+      var response = await post(uri, body: body, headers: {
+        Consts.CONTENT_TYPE: 'application/json',
+      });
+
+      var rawData = json.decode(response.body);
+
+      if (response.statusCode == 200 && rawData[Consts.STATUS] == "success") {
+          final pref = await SharedPreferences.getInstance();
+          pref.setBool(Consts.IS_LOGIN, true);
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => Dashboard()),
+                (route) => false,
+          );
+      } else if(response.statusCode == 400 && rawData[Consts.STATUS] == "error"){
+        Fluttertoast.showToast(msg: rawData[Consts.MESSAGE]);
+      }
+    } catch (exception, trace) {
+      print('Exception : $exception , Trace : $trace');
+    }
+    setState(() {
+      _isLoading = false;
+    });
+
   }
 
   @override

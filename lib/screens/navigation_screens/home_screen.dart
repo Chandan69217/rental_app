@@ -295,7 +295,7 @@ class _HomeScreenStates extends State<HomeScreen> {
                           label: 'Attendance',
                           onTap: () => Navigator.of(context).push(
                               MaterialPageRoute(
-                                  builder: (context) => AttendanceScreen())),
+                                  builder: (context) => AttendanceScreen(enableBack: true,))),
                         ),
                         _MenuButton(
                           iconPath: 'assets/icons/notice.webp',

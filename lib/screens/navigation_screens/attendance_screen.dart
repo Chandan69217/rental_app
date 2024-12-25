@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:sizing/sizing.dart';
 import '../../custom_paints/circular_curve.dart';
 import '../../utilities/color_theme.dart';
@@ -34,31 +35,42 @@ class _FeeScreenStates extends State<AttendanceScreen> {
               color: ColorTheme.Snow_white,
             )),
       ),
+
       body: SafeArea(
-          child: SingleChildScrollView(
-        padding: EdgeInsets.all(16.ss),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            _punchCard(),
-            SizedBox(height: 10.ss,),
-            const Text('Last Attendance',textAlign: TextAlign.start,),
-            Container(
-              padding: EdgeInsets.symmetric(vertical:  12.ss),
-              child: ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                  itemCount: 10,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) => Card(
-                    elevation: 2.ss,
-                    child: ListTile(
-                          title: Text('Hello'),
-                        ),
-                  )),
-            )
-          ],
-        ),
-      )),
+          child: Padding(
+            padding: EdgeInsets.all(16.ss),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _punchCard(),
+                SizedBox(height: 10.ss,),
+                const Text('Last Attendance',textAlign: TextAlign.start,),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical:  12.ss),
+                    child: ListView.builder(
+                        itemCount: 10,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) => Card(
+                          elevation: 2.ss,
+                          child: ListTile(
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text('In : 10:34 AM'),
+                                    Text('Out : 4:23 PM'),
+                                  ],
+                                ),
+                            trailing: Text('23-Dec-24'),
+                              ),
+                        )),
+                  ),
+                )
+              ],
+            ),
+          )),
     );
   }
 
@@ -102,71 +114,64 @@ class _FeeScreenStates extends State<AttendanceScreen> {
                     SizedBox(
                       width: 10.ss,
                     ),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Chandan Sharma',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(color: ColorTheme.Snow_white),
-                          ),
-                          Text(
-                            'Building: 12A | Room No: 56',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall!
-                                .copyWith(color: ColorTheme.Ghost_White),
-                          ),
-                          SizedBox(
-                            height: 5.ss,
-                          ),
-                        ],
-                      ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Chandan Sharma',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(color: ColorTheme.Snow_white),
+                        ),
+                        Text(
+                          'Building: 12A | Room No: 56',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall!
+                              .copyWith(color: ColorTheme.Ghost_White),
+                        ),
+                        SizedBox(
+                          height: 5.ss,
+                        ),
+                      ],
                     ),
                   ],
                 ),
                 SizedBox(
-                  height: 10.ss,
+                  height: 8.ss,
                 ),
                 Padding(
                     padding: EdgeInsets.only(left: 8.ss),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Expanded(
-                          flex: 2,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'In : 23-Dec-2024 11:17 AM',
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'In : 23-Dec-2024 11:17 AM',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(color: ColorTheme.Snow_white),
+                            ),
+                            Text('Out : N/A',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall!
-                                    .copyWith(color: ColorTheme.Snow_white),
-                              ),
-                              Text('Out : N/A',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall!
-                                      .copyWith(color: ColorTheme.Snow_white)),
-                            ],
-                          ),
+                                    .copyWith(color: ColorTheme.Snow_white)),
+                          ],
                         ),
-                        Expanded(
-                          flex: 0,
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            child: Text('Punch Out'),
-                            style: ButtonStyle(
-                                backgroundColor:
-                                    WidgetStatePropertyAll(Colors.red),
-                                foregroundColor: WidgetStatePropertyAll(
-                                    ColorTheme.Snow_white)),
-                          ),
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: const ButtonStyle(
+                              backgroundColor:
+                                  WidgetStatePropertyAll(Colors.red),
+                              foregroundColor: WidgetStatePropertyAll(
+                                  ColorTheme.Snow_white)),
+                          child: Text('Punch Out'),
                         )
                       ],
                     ))

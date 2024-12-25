@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -236,7 +237,10 @@ class _LoginScreenStates extends State<LoginScreen>
   void _login() async {
     final String mobileTxt = _mobileTxtController.text.trim();
     final String passwordTxt = _passwordController.text.trim();
-
+    setState(() {
+      _isLoading = true;
+    });
+    final List<ConnectivityResult> connectivityResult = await Connectivity().checkConnectivity();
     if (mobileTxt.isEmpty) {
       _mobileFocusNode.requestFocus();
       return;
@@ -252,36 +256,38 @@ class _LoginScreenStates extends State<LoginScreen>
       return;
     }
 
-    try {
-      setState(() {
-        _isLoading = true;
-      });
-      var uri = Uri.parse('https://appadmin.atharvaservices.com/api/LoginCheck/login');
+    if(connectivityResult.contains(ConnectivityResult.mobile)||connectivityResult.contains(ConnectivityResult.wifi)||connectivityResult.contains(ConnectivityResult.ethernet)){
+      try {
+        var uri = Uri.parse('https://appadmin.atharvaservices.com/api/LoginCheck/login');
 
-      var body = json.encode({
-        Consts.MOBILE: mobileTxt,
-        Consts.PASSWORD: passwordTxt,
-      });
+        var body = json.encode({
+          Consts.MOBILE: mobileTxt,
+          Consts.PASSWORD: passwordTxt,
+        });
 
-      var response = await post(uri, body: body, headers: {
-        Consts.CONTENT_TYPE: 'application/json',
-      });
+        var response = await post(uri, body: body, headers: {
+          Consts.CONTENT_TYPE: 'application/json',
+        });
 
-      var rawData = json.decode(response.body);
+        var rawData = json.decode(response.body);
 
-      if (response.statusCode == 200 && rawData[Consts.STATUS] == "success") {
+        if (response.statusCode == 200 && rawData[Consts.STATUS] == "success") {
           final pref = await SharedPreferences.getInstance();
           pref.setBool(Consts.IS_LOGIN, true);
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => Dashboard()),
                 (route) => false,
           );
-      } else if(response.statusCode == 400 && rawData[Consts.STATUS] == "error"){
-        Fluttertoast.showToast(msg: rawData[Consts.MESSAGE]);
+        } else if(response.statusCode == 400 && rawData[Consts.STATUS] == "error"){
+          Fluttertoast.showToast(msg: rawData[Consts.MESSAGE]);
+        }
+      } catch (exception, trace) {
+        print('Exception : $exception , Trace : $trace');
       }
-    } catch (exception, trace) {
-      print('Exception : $exception , Trace : $trace');
+    }else{
+      Fluttertoast.showToast(msg: 'check your internet connection',);
     }
+
     setState(() {
       _isLoading = false;
     });

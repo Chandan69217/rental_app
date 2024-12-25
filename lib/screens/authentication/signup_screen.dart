@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +8,6 @@ import 'package:http/http.dart';
 import 'package:rental_app/screens/authentication/login_screen.dart';
 import 'package:rental_app/widgets/custom_button.dart';
 import 'package:rental_app/widgets/custom_textfield.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
 import '../../model/consts.dart';
 import '../../utilities/color_theme.dart';
@@ -208,7 +207,12 @@ class _SignupScreenStates extends State<SignupScreen> with WidgetsBindingObserve
     String name = _nameTxtController.text;
     String mobile = _mobileTxtController.text;
     String password = _passwordTxtController.text;
+    final List<ConnectivityResult> connectivityResult = await Connectivity().checkConnectivity();
 
+    setState(() {
+      _isLoading = true;
+    });
+    
     if(name.isEmpty){
       _nameFocusNode.requestFocus();
       return;
@@ -223,44 +227,48 @@ class _SignupScreenStates extends State<SignupScreen> with WidgetsBindingObserve
     _passwordFocusNode.requestFocus();
       return;
     }
-    
-    try{
-      setState(() {
-        _isLoading = true;
-      });
-      var uri = Uri.parse('https://appadmin.atharvaservices.com/api/Register/UserRegister');
 
-      var body = json.encode({
+
+    if(connectivityResult.contains(ConnectivityResult.mobile)||connectivityResult.contains(ConnectivityResult.wifi)||connectivityResult.contains(ConnectivityResult.ethernet)){
+      try{
+        var uri = Uri.parse('https://appadmin.atharvaservices.com/api/Register/UserRegister');
+
+        var body = json.encode({
           Consts.USER_NAME: name,
           Consts.MOBILE: mobile,
           Consts.PASSWORD: password,
-      });
+        });
 
-      var response = await post(uri, body: body ,headers: {
-        Consts.CONTENT_TYPE: 'application/json',
-      });
+        var response = await post(uri, body: body ,headers: {
+          Consts.CONTENT_TYPE: 'application/json',
+        });
 
-      var rawData = await json.decode(response.body);
+        var rawData = await json.decode(response.body);
 
-      if(response.statusCode == 200 && rawData[Consts.STATUS] == 'success'){
-        Fluttertoast.showToast(msg: 'user register successfully');
-        if(Navigator.canPop(context)){
-          Navigator.of(context).pop();
-        }else{
-          Navigator.of(context).push(MaterialPageRoute(builder: (context)=> LoginScreen()));
-        }
-        // final pref = await SharedPreferences.getInstance();
-        // pref.setBool(Consts.IS_LOGIN, true);
-        // Navigator.of(context).pushAndRemoveUntil(
-        //   MaterialPageRoute(builder: (context) => Dashboard()),
-        //       (route) => false,
-        // );
-      }else if(response.statusCode == 400 && rawData[Consts.STATUS] == 'error'){
-        Fluttertoast.showToast(msg: rawData[Consts.MESSAGE]);
-      };
-    }catch(exception,trace){
-      print('exception : $exception, trace : $trace');
+        if(response.statusCode == 200 && rawData[Consts.STATUS] == 'success'){
+          Fluttertoast.showToast(msg: 'user register successfully');
+          if(Navigator.canPop(context)){
+            Navigator.of(context).pop();
+          }else{
+            Navigator.of(context).push(MaterialPageRoute(builder: (context)=> LoginScreen()));
+          }
+          // final pref = await SharedPreferences.getInstance();
+          // pref.setBool(Consts.IS_LOGIN, true);
+          // Navigator.of(context).pushAndRemoveUntil(
+          //   MaterialPageRoute(builder: (context) => Dashboard()),
+          //       (route) => false,
+          // );
+        }else if(response.statusCode == 400 && rawData[Consts.STATUS] == 'error'){
+          Fluttertoast.showToast(msg: rawData[Consts.MESSAGE]);
+        };
+      }catch(exception,trace){
+        print('exception : $exception, trace : $trace');
+      }
+    }else{
+      Fluttertoast.showToast(msg: 'check your internet connection',);
     }
+    
+
     setState(() {
       _isLoading = false;
     });

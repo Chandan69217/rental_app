@@ -14,7 +14,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardStates extends State<Dashboard> {
-  static int _currentIndex = 0;
+  int _currentIndex = 0;
   final List<Widget> _screens = [];
 
   @override

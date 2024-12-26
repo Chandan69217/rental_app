@@ -54,19 +54,30 @@ class _FeeScreenStates extends State<AttendanceScreen> {
                         shrinkWrap: true,
                         itemBuilder: (context, index) => Card(
                           elevation: 2.ss,
-                          child: ListTile(
-                                title: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text('In : 10:34 AM'),
-                                    Text('Out : 4:23 PM'),
-                                  ],
+                          child: Container(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(15.ss),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('In : 10:34 AM',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),),
+                                        Text('Out : 4:23 PM',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                            trailing: Text('23-Dec-24'),
-                              ),
-                        )),
+                                Expanded(child: Container(padding: EdgeInsets.symmetric(horizontal: 10.ss,vertical: 2.ss),alignment: Alignment.bottomRight,child: Text('23-Dec-24',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),)))
+                              ],
+                            ),
+                          ),
+                        )
                   ),
+                )
                 )
               ],
             ),

@@ -10,4 +10,25 @@ class Consts {
   static const String TOKEN = 'token';
   static const String IS_LOGIN = 'is_login';
   static const String CONTENT_TYPE = 'Content-Type';
+  static const String DUE_AMOUNT = 'dueAmount';
+  static const String ID = 'id';
+  static const String TENANT_NAME = 'tenantName';
+  static const String ROOM_NO = 'roomNumber';
+  static const String DUE_DATE = 'dueDate';
+  static const String PROFILE = 'profile';
+  static const String CONTACT_NUMBER = 'contactNumber';
+  static const String PROFILE_IMAGE = 'profileImage';
+  static const String WHATSAPP_NUMBER = 'whatsappNumber';
+  static const String ADDRESS = 'address';
+  static const String FATHER_NAME = 'fatherName';
+  static const String MOTHER_NAME = 'motherName';
+  static const String OCCUPATION = 'occupation';
+  static const String MEALS = 'meals';
+  static const String  VERIFICATION_CODE= 'verificationCode';
+  static const String TIME = 'time';
+  static const String BREAKFAST = 'Breakfast';
+  static const String LUNCH = 'lunch';
+  static const String DINNER = 'dinner';
+  static const String ACTIVE = 'active';
+  static const String INACTIVE = 'inactive';
 }

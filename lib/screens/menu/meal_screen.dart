@@ -1,11 +1,13 @@
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:rental_app/model/meals.dart';
 import 'package:rental_app/utilities/color_theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
+
+import '../../model/consts.dart';
 
 class MealScreen extends StatefulWidget {
   @override
@@ -14,49 +16,41 @@ class MealScreen extends StatefulWidget {
 
 class _MealScreenStates extends State<MealScreen> {
   final bool isEnabled = false;
+  String tenantName = 'unknown name';
 
-  Future<List<Map<String, dynamic>>> _getMealsData() async {
-    // Simulate a delay (e.g., fetching data from a remote server)
-    await Future.delayed(Duration(seconds: 3));
+  Future<List<Map<String, dynamic>>>? _getMealsData() async {
+    var uri = Uri.parse('https://appadmin.atharvaservices.com/api/Meal/tenantMeal');
+    var pref = await SharedPreferences.getInstance();
+    var token = pref.getString(Consts.TOKEN) ?? '';
 
-    // JSON string
-    String mealsJsonString = '''
-  {
-    "meals": [
-      {
-        "id": 1,
-        "name": "Breakfast",
-        "time": "08:00 AM",
-        "verificationCode": "ABC123",
-        "status": "active"
-      },
-      {
-        "id": 2,
-        "name": "Lunch",
-        "time": "01:00 PM",
-        "verificationCode": "DEF456",
-        "status": "active"
-      },
-      {
-        "id": 3,
-        "name": "Dinner",
-        "time": "07:00 PM",
-        "verificationCode": "GHI789",
-        "status": "inactive"
-      }
-    ]
-  }
-  ''';
+    if (token.isEmpty) {
+      print('Token is empty');
+      return [];
+    }
 
-    // Decoding the JSON
-    Map<String, dynamic> decodedJson = json.decode(mealsJsonString);
+   try{
+     var response = await get(uri,headers: {
+       Consts.AUTHORIZATION: 'Bearer $token', // Ensure 'Bearer ' is prefixed to the token
+       Consts.CONTENT_TYPE: 'application/json',
+     });
 
-    // Accessing the 'meals' array
-    List<Map<String, dynamic>> mealsList =
-        List<Map<String, dynamic>>.from(decodedJson['meals']);
+     print('Status Code: ${response.statusCode}');
+     print('Response Body: ${response.body}');
 
-    // Returning the meals data
-    return mealsList;
+     if(response.statusCode == 200){
+       tenantName = pref.getString(Consts.NAME) ?? 'unknown name';
+       Map<String, dynamic> decodedJson = json.decode(response.body);
+       List<Map<String, dynamic>> mealsList =
+       List<Map<String, dynamic>>.from(decodedJson['meal']);
+       return mealsList;
+     }else{
+       print('Request failed with status: ${response.statusCode}');
+       return [];
+     }
+   }catch(exception,trace){
+     print('Exception : $exception , Trace : $trace');
+     return [];
+   }
   }
 
   @override
@@ -80,44 +74,46 @@ class _MealScreenStates extends State<MealScreen> {
         body: FutureBuilder(
             future: _getMealsData(),
             builder: (context, snapshot) {
-              return Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.ss, vertical: 24),
-                child: Column(
-                  children: [
-                    _MealTile(
-                      onClick: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => _VisitScreen()));
-                      },
-                      title: 'Breakfast',
-                      subTitle:
-                          'get your breakfast between 8:00 AM to 11:00 AM',
-                      loading: snapshot.hasData,
-                    ),
-                    SizedBox(
-                      height: 18.ss,
-                    ),
-                    _MealTile(
-                      onClick: () {},
-                      title: 'Lunch',
-                      subTitle: 'get your lunch between 1:00 PM to 2:30 PM',
-                      enabled: false,
-                      loading: snapshot.hasData,
-                    ),
-                    SizedBox(
-                      height: 18.ss,
-                    ),
-                    _MealTile(
-                      onClick: () {},
-                      title: 'Dinner',
-                      subTitle: 'get your dinner between 8:00 PM to 10:00 PM',
-                      enabled: false,
-                      loading: snapshot.hasData,
-                    ),
-                  ],
-                ),
-              );
-            }));
+                return Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12.ss, vertical: 24),
+                  child: Column(
+                    children: [
+                      _MealTile(
+                        onClick: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => _VisitScreen(mealsDetails: snapshot.data![0],tenantName: tenantName,)));
+                        },
+                        title: 'Breakfast',
+                        subTitle: snapshot.hasData ? 'get your breakfast between ${snapshot.data![0]['mealStartTime']} to ${snapshot.data![0]['mealEndtime']}' : '',
+                        loading: snapshot.hasData,
+                      ),
+                      SizedBox(
+                        height: 18.ss,
+                      ),
+                      _MealTile(
+                        onClick: () {},
+                        title: 'Lunch',
+                        subTitle: snapshot.hasData ? 'get your lunch between ${snapshot.data![1]['mealStartTime']} to ${snapshot.data![1]['mealEndtime']}' : '',
+                        enabled: false,
+                        loading: snapshot.hasData,
+                      ),
+                      SizedBox(
+                        height: 18.ss,
+                      ),
+                      _MealTile(
+                        onClick: () {},
+                        title: 'Dinner',
+                        subTitle: snapshot.hasData ? 'get your dinner between ${snapshot.data![2]['mealStartTime']} to ${snapshot.data![2]['mealEndtime']}' : '',
+                        enabled: false,
+                        loading: snapshot.hasData,
+                      ),
+                    ],
+                  ),
+                );
+
+            }
+            )
+    );
   }
 }
 
@@ -220,11 +216,14 @@ class _MealTile extends StatelessWidget {
 }
 
 class _VisitScreen extends StatelessWidget {
+  final Map<String,dynamic> mealsDetails;
+  final String tenantName;
+  _VisitScreen({required this.mealsDetails,required this.tenantName});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Breakfast'),
+        title: Text(mealsDetails['mealName']),
         backgroundColor: ColorTheme.Blue,
         foregroundColor: ColorTheme.Snow_white,
         leading: IconButton(
@@ -247,7 +246,7 @@ class _VisitScreen extends StatelessWidget {
                   Opacity(
                     opacity: 0.5,
                     child: QrImageView(
-                      data: 'Hello World!',
+                      data: mealsDetails.toString(),
                       version: QrVersions.auto,
                       size: MediaQuery.of(context).size.width * 0.7,
                     ),
@@ -260,7 +259,7 @@ class _VisitScreen extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: 10.ss),
                 child: RichText(
                     text: TextSpan(
-                        text: 'Chandan Sharma',
+                        text: tenantName,
                         style: Theme.of(context).textTheme.bodyMedium,
                         children: [
                       TextSpan(text: '\n'),
@@ -281,6 +280,13 @@ class _VisitScreen extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
+
 
 // class _FoodShowCase extends StatelessWidget{
 //   final List<String> picture;

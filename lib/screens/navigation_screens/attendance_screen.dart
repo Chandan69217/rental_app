@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:rental_app/custom_paints/rect_painter.dart';
 import 'package:sizing/sizing.dart';
 import '../../custom_paints/circular_curve.dart';
 import '../../utilities/color_theme.dart';
@@ -52,27 +53,41 @@ class _FeeScreenStates extends State<AttendanceScreen> {
                     child: ListView.builder(
                         itemCount: 10,
                         shrinkWrap: true,
-                        itemBuilder: (context, index) => Card(
-                          elevation: 2.ss,
+                        itemBuilder: (context, index) => Padding(
+                          padding: EdgeInsets.symmetric(vertical: 5.ss,horizontal: 5.ss),
                           child: Container(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: EdgeInsets.all(15.ss),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text('In : 10:34 AM',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),),
-                                        Text('Out : 4:23 PM',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),),
-                                      ],
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.ss),
+                              color: ColorTheme.Ghost_White,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 5.ss,
+                                  blurStyle: BlurStyle.outer
+                                )
+                              ]
+                            ),
+                            child: CustomPaint(
+                              painter: RectPainter(),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Expanded(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(15.ss),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text('In : 10:34 AM',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),),
+                                          Text('Out : 4:23 PM',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Expanded(child: Container(padding: EdgeInsets.symmetric(horizontal: 10.ss,vertical: 2.ss),alignment: Alignment.bottomRight,child: Text('23-Dec-24',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),)))
-                              ],
+                                  Expanded(child: Container(padding: EdgeInsets.symmetric(horizontal: 10.ss,vertical: 2.ss),alignment: Alignment.bottomRight,child: Text('23-Dec-24',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),)))
+                                ],
+                              ),
                             ),
                           ),
                         )

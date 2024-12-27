@@ -100,6 +100,7 @@ class _ProfileScreenStates extends State<ProfileScreen> {
                                     var pref = await SharedPreferences.getInstance();
                                     if(pref.containsKey(Consts.IS_LOGIN)){
                                       pref.remove(Consts.IS_LOGIN);
+                                      pref.remove(Consts.TOKEN);
                                       Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> const WelcomeScreen()),(route)=>false);
                                     }
                                   },

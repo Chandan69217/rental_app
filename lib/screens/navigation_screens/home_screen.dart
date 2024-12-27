@@ -6,8 +6,10 @@ import 'package:rental_app/screens/menu/notification_screen.dart';
 import 'package:rental_app/screens/navigation_screens/attendance_screen.dart';
 import 'package:rental_app/screens/navigation_screens/fee_screen.dart';
 import 'package:rental_app/screens/navigation_screens/profile_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
 
+import '../../model/consts.dart';
 import '../../utilities/color_theme.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,328 +18,344 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenStates extends State<HomeScreen> {
+  late String tenantName;
+  @override
+  void initState() {
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Home',
-              style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                  fontSize: 16.fss,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w400),
-            ),
-            Row(
-              children: [
-                Image.asset(
-                  'assets/icons/location_icon.webp',
-                  width: 20.ss,
-                  height: 20.ss,
-                  fit: BoxFit.cover,
-                ),
-                SizedBox(
-                  width: 5.ss,
-                ),
-                Text(
-                  'Patna, Bihar',
-                  style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                      fontSize: 16.fss,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w400),
-                ),
-              ],
-            )
-          ],
-        ),
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 16.ss),
-            child: InkWell(
-                borderRadius: BorderRadius.circular(20.ss),
-                overlayColor:
-                    WidgetStatePropertyAll(ColorTheme.Blue.withOpacity(0.1)),
-                onTap: () {},
-                child: Padding(
-                  padding: EdgeInsets.all(8.ss),
-                  child: Badge(
-                    child: Icon(Icons.notifications_none_rounded),
-                    label: Text('2'),
+    return FutureBuilder(future: init(), builder: (context,snapshot){
+      if(snapshot.hasData){
+        return Scaffold(
+            appBar: AppBar(
+              title: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Home',
+                    style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                        fontSize: 16.fss,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w400),
                   ),
-                )),
-          )
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(16.ss),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width,
-                // padding: EdgeInsets.all(24.ss),
-                decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: ColorTheme.Gray,
-                        blurRadius: 10.ss,
-                        spreadRadius: 3.ss,
+                  Row(
+                    children: [
+                      Image.asset(
+                        'assets/icons/location_icon.webp',
+                        width: 20.ss,
+                        height: 20.ss,
+                        fit: BoxFit.cover,
+                      ),
+                      SizedBox(
+                        width: 5.ss,
+                      ),
+                      Text(
+                        'Patna, Bihar',
+                        style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                            fontSize: 16.fss,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w400),
                       ),
                     ],
-                    borderRadius: BorderRadius.circular(14.ss),
-                    color: ColorTheme.Blue.withOpacity(0.95)),
-                child: CustomPaint(
-                  painter: CircularWave(
-                      waveColor: ColorTheme.Snow_white,
-                      waveHeight: 60,
-                      waveLength: 550,
-                      phaseShift: 1),
-                  child: Padding(
-                    padding: EdgeInsets.all(24.ss),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
+                  )
+                ],
+              ),
+              actions: [
+                Padding(
+                  padding: EdgeInsets.only(right: 16.ss),
+                  child: InkWell(
+                      borderRadius: BorderRadius.circular(20.ss),
+                      overlayColor:
+                      WidgetStatePropertyAll(ColorTheme.Blue.withOpacity(0.1)),
+                      onTap: () {},
+                      child: Padding(
+                        padding: EdgeInsets.all(8.ss),
+                        child: Badge(
+                          child: Icon(Icons.notifications_none_rounded),
+                          label: Text('2'),
+                        ),
+                      )),
+                )
+              ],
+            ),
+            body: SafeArea(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(16.ss),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      // padding: EdgeInsets.all(24.ss),
+                      decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: ColorTheme.Gray,
+                              blurRadius: 10.ss,
+                              spreadRadius: 3.ss,
+                            ),
+                          ],
+                          borderRadius: BorderRadius.circular(14.ss),
+                          color: ColorTheme.Blue.withOpacity(0.95)),
+                      child: CustomPaint(
+                        painter: CircularWave(
+                            waveColor: ColorTheme.Snow_white,
+                            waveHeight: 60,
+                            waveLength: 550,
+                            phaseShift: 1),
+                        child: Padding(
+                          padding: EdgeInsets.all(24.ss),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                'Hi, Chandan Sharma',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyMedium!
-                                    .copyWith(color: ColorTheme.Snow_white),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Hi, $tenantName',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(color: ColorTheme.Snow_white),
+                                    ),
+                                    Text(
+                                      'Building: 12A | Room No: 56',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleSmall!
+                                          .copyWith(color: ColorTheme.Ghost_White),
+                                    ),
+                                    SizedBox(
+                                      height: 5.ss,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Image.asset(
+                                          'assets/icons/phone_outline.webp',
+                                          width: 17.ss,
+                                          height: 17.ss,
+                                          color: ColorTheme.Snow_white,
+                                        ),
+                                        SizedBox(
+                                          width: 5.ss,
+                                        ),
+                                        Text(
+                                          '8969893457',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleSmall!
+                                              .copyWith(
+                                              color: ColorTheme.Ghost_White),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 5.ss,
+                                    ),
+                                    Row(
+                                      children: [
+                                        Image.asset(
+                                          'assets/icons/id-card-icon.webp',
+                                          width: 20.ss,
+                                          height: 20.ss,
+                                          color: ColorTheme.Snow_white,
+                                        ),
+                                        SizedBox(
+                                          width: 5.ss,
+                                        ),
+                                        Text(
+                                          '821061985417',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleSmall!
+                                              .copyWith(
+                                              color: ColorTheme.Ghost_White),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                              Text(
-                                'Building: 12A | Room No: 56',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleSmall!
-                                    .copyWith(color: ColorTheme.Ghost_White),
-                              ),
-                              SizedBox(
-                                height: 5.ss,
-                              ),
-                              Row(
-                                children: [
-                                  Image.asset(
-                                    'assets/icons/phone_outline.webp',
-                                    width: 17.ss,
-                                    height: 17.ss,
-                                    color: ColorTheme.Snow_white,
-                                  ),
-                                  SizedBox(
-                                    width: 5.ss,
-                                  ),
-                                  Text(
-                                    '8969893457',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleSmall!
-                                        .copyWith(
-                                            color: ColorTheme.Ghost_White),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                height: 5.ss,
-                              ),
-                              Row(
-                                children: [
-                                  Image.asset(
-                                    'assets/icons/id-card-icon.webp',
-                                    width: 20.ss,
-                                    height: 20.ss,
-                                    color: ColorTheme.Snow_white,
-                                  ),
-                                  SizedBox(
-                                    width: 5.ss,
-                                  ),
-                                  Text(
-                                    '821061985417',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleSmall!
-                                        .copyWith(
-                                            color: ColorTheme.Ghost_White),
-                                  ),
-                                ],
-                              ),
+                              ClipRRect(
+                                  borderRadius: BorderRadius.circular(50.ss),
+                                  child: Image.asset(
+                                    'assets/hotels_images/profile_pic.webp',
+                                    fit: BoxFit.cover,
+                                    width: 60.ss,
+                                    height: 60.ss,
+                                  )),
                             ],
                           ),
                         ),
-                        ClipRRect(
-                            borderRadius: BorderRadius.circular(50.ss),
-                            child: Image.asset(
-                              'assets/hotels_images/profile_pic.webp',
-                              fit: BoxFit.cover,
-                              width: 60.ss,
-                              height: 60.ss,
-                            )),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 15.ss,
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                padding:
-                    EdgeInsets.symmetric(horizontal: 24.ss, vertical: 10.ss),
-                decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: ColorTheme.Gray,
-                        blurRadius: 10.ss,
-                        spreadRadius: 3.ss,
                       ),
-                    ],
-                    borderRadius: BorderRadius.circular(14.ss),
-                    color: ColorTheme.Blue.withOpacity(0.95)),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('Due Amount: ',
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            color: ColorTheme.Snow_white, fontSize: 10.fss)),
-                    Expanded(
+                    ),
+                    SizedBox(
+                      height: 15.ss,
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding:
+                      EdgeInsets.symmetric(horizontal: 24.ss, vertical: 10.ss),
+                      decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: ColorTheme.Gray,
+                              blurRadius: 10.ss,
+                              spreadRadius: 3.ss,
+                            ),
+                          ],
+                          borderRadius: BorderRadius.circular(14.ss),
+                          color: ColorTheme.Blue.withOpacity(0.95)),
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Image.asset(
-                            'assets/icons/rupee-icon.webp',
-                            width: 12.ss,
-                            height: 10.ss,
-                            fit: BoxFit.cover,
-                            color: ColorTheme.Snow_white,
+                          Text('Due Amount: ',
+                              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                  color: ColorTheme.Snow_white, fontSize: 10.fss)),
+                          Expanded(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/icons/rupee-icon.webp',
+                                  width: 12.ss,
+                                  height: 10.ss,
+                                  fit: BoxFit.cover,
+                                  color: ColorTheme.Snow_white,
+                                ),
+                                Text(
+                                  '2300.00',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium!
+                                      .copyWith(
+                                      color: ColorTheme.Snow_white,
+                                      fontSize: 10.fss),
+                                )
+                              ],
+                            ),
                           ),
-                          Text(
-                            '2300.00',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(
-                                    color: ColorTheme.Snow_white,
-                                    fontSize: 10.fss),
+                          SizedBox(
+                            height: 35.ss,
+                            child: ElevatedButton(
+                                onPressed: () {},
+                                child: const Text(
+                                  'Pay now',
+                                  style: TextStyle(color: Colors.deepPurple),
+                                )),
                           )
                         ],
                       ),
                     ),
-                    SizedBox(
-                      height: 35.ss,
-                      child: ElevatedButton(
-                          onPressed: () {},
-                          child: const Text(
-                            'Pay now',
-                            style: TextStyle(color: Colors.deepPurple),
-                          )),
-                    )
-                  ],
-                ),
-              ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.symmetric(vertical: 18.ss),
-                decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.circular(14.ss),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 12.ss),
-                      child: const Text(
-                        'Menu',
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.symmetric(vertical: 18.ss),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.circular(14.ss),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(left: 12.ss),
+                            child: const Text(
+                              'Menu',
+                            ),
+                          ),
+                          SizedBox(
+                            height: 8.ss,
+                          ),
+                          GridView.count(
+                            crossAxisCount: 4,
+                            shrinkWrap: true,
+                            mainAxisSpacing: 14.ss,
+                            crossAxisSpacing: 12.ss,
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: EdgeInsets.symmetric(vertical: 4.ss),
+                            children: [
+                              _MenuButton(
+                                iconPath: 'assets/icons/profile.webp',
+                                label: 'Profile',
+                                onTap: () =>
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (context) => ProfileScreen(
+                                          enableBack: true,
+                                        ))),
+                              ),
+                              _MenuButton(
+                                iconPath: 'assets/icons/food.webp',
+                                label: 'Meal',
+                                onTap: () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (context) => MealScreen())),
+                              ),
+                              _MenuButton(
+                                iconPath: 'assets/icons/attendant-list.webp',
+                                label: 'Attendance',
+                                onTap: () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (context) => AttendanceScreen(enableBack: true,))),
+                              ),
+                              _MenuButton(
+                                iconPath: 'assets/icons/notice.webp',
+                                label: 'Notice',
+                                onTap: () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (context) => NotificationScreen())),
+                              ),
+                              _MenuButton(
+                                iconPath: 'assets/icons/fee.webp',
+                                label: 'Fee',
+                                onTap: () =>
+                                    Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (context) => FeeScreen(
+                                          enableBack: true,
+                                        ))),
+                              ),
+                              _MenuButton(
+                                iconPath: 'assets/icons/reminder.webp',
+                                label: 'Reminder',
+                                onTap: () {},
+                              ),
+                              _MenuButton(
+                                iconPath: 'assets/icons/support.webp',
+                                label: 'Helpdesk',
+                                onTap: () {},
+                              ),
+                              _MenuButton(
+                                iconPath: 'assets/icons/leave.webp',
+                                label: 'Leave',
+                                onTap: () {},
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                    SizedBox(
-                      height: 8.ss,
-                    ),
-                    GridView.count(
-                      crossAxisCount: 4,
-                      shrinkWrap: true,
-                      mainAxisSpacing: 14.ss,
-                      crossAxisSpacing: 12.ss,
-                      physics: const NeverScrollableScrollPhysics(),
-                      padding: EdgeInsets.symmetric(vertical: 4.ss),
-                      children: [
-                        _MenuButton(
-                          iconPath: 'assets/icons/profile.webp',
-                          label: 'Profile',
-                          onTap: () =>
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => ProfileScreen(
-                                        enableBack: true,
-                                      ))),
-                        ),
-                        _MenuButton(
-                          iconPath: 'assets/icons/food.webp',
-                          label: 'Meal',
-                          onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (context) => MealScreen())),
-                        ),
-                        _MenuButton(
-                          iconPath: 'assets/icons/attendant-list.webp',
-                          label: 'Attendance',
-                          onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (context) => AttendanceScreen(enableBack: true,))),
-                        ),
-                        _MenuButton(
-                          iconPath: 'assets/icons/notice.webp',
-                          label: 'Notice',
-                          onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (context) => NotificationScreen())),
-                        ),
-                        _MenuButton(
-                          iconPath: 'assets/icons/fee.webp',
-                          label: 'Fee',
-                          onTap: () =>
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => FeeScreen(
-                                        enableBack: true,
-                                      ))),
-                        ),
-                        _MenuButton(
-                          iconPath: 'assets/icons/reminder.webp',
-                          label: 'Reminder',
-                          onTap: () {},
-                        ),
-                        _MenuButton(
-                          iconPath: 'assets/icons/support.webp',
-                          label: 'Helpdesk',
-                          onTap: () {},
-                        ),
-                        _MenuButton(
-                          iconPath: 'assets/icons/leave.webp',
-                          label: 'Leave',
-                          onTap: () {},
-                        ),
-                      ],
-                    ),
                   ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-    );
+            )
+        );
+      }else{
+        return Scaffold(body: Center(child: CircularProgressIndicator(color: ColorTheme.Blue,),),);
+      }
+    });
+  }
+
+  Future<bool> init()async {
+    tenantName = (await SharedPreferences.getInstance()).getString(Consts.NAME) ?? '';
+    return true;
   }
 }
 

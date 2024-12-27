@@ -31,4 +31,6 @@ class Consts {
   static const String DINNER = 'dinner';
   static const String ACTIVE = 'active';
   static const String INACTIVE = 'inactive';
+  static const String AUTHORIZATION = 'authorization';
+  static const String MEAL_NAME = 'mealName';
 }

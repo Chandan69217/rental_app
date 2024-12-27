@@ -237,9 +237,6 @@ class _LoginScreenStates extends State<LoginScreen>
   void _login() async {
     final String mobileTxt = _mobileTxtController.text.trim();
     final String passwordTxt = _passwordController.text.trim();
-    setState(() {
-      _isLoading = true;
-    });
     final List<ConnectivityResult> connectivityResult = await Connectivity().checkConnectivity();
     if (mobileTxt.isEmpty) {
       _mobileFocusNode.requestFocus();
@@ -256,6 +253,9 @@ class _LoginScreenStates extends State<LoginScreen>
       return;
     }
 
+    setState(() {
+      _isLoading = true;
+    });
     if(connectivityResult.contains(ConnectivityResult.mobile)||connectivityResult.contains(ConnectivityResult.wifi)||connectivityResult.contains(ConnectivityResult.ethernet)){
       try {
         var uri = Uri.parse('https://appadmin.atharvaservices.com/api/LoginCheck/login');
@@ -274,6 +274,8 @@ class _LoginScreenStates extends State<LoginScreen>
         if (response.statusCode == 200 && rawData[Consts.STATUS] == "success") {
           final pref = await SharedPreferences.getInstance();
           pref.setBool(Consts.IS_LOGIN, true);
+          pref.setString(Consts.TOKEN, rawData[Consts.DATA][Consts.TOKEN]);
+          pref.setString(Consts.NAME, rawData[Consts.DATA][Consts.NAME]);
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => Dashboard()),
                 (route) => false,

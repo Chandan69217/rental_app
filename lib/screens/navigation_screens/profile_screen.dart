@@ -16,6 +16,12 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenStates extends State<ProfileScreen> {
+  String tenantName = 'Unknown';
+  Future<bool> init() async{
+    var pref =  await SharedPreferences.getInstance();
+    tenantName = pref.getString(Consts.TENANT_NAME) ?? 'Unknown';
+    return true;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,92 +38,99 @@ class _ProfileScreenStates extends State<ProfileScreen> {
         centerTitle: true,
         backgroundColor: ColorTheme.Blue,
       ),
-      body: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Expanded(flex:1,child: SizedBox()),
-              Expanded(
-                flex: 14,
-                child: Container(
-                    constraints: BoxConstraints(
-                        minWidth: MediaQuery.of(context).size.width,
-                        minHeight: MediaQuery.of(context).size.height * 0.8
-                    ),
-                  decoration: BoxDecoration(
-                      color: ColorTheme.Ghost_White,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          offset: Offset(0, -14.ss),
-                          blurRadius: 12.ss,)
-                      ],
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(35.ss),
-                          topRight: Radius.circular(35.ss))),
-                  child:
-                  Column(
-                    children: [
+      body: FutureBuilder(future: init(), builder: (content,snapshot){
+        if(snapshot.hasData){
+          return SafeArea(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Expanded(flex:1,child: SizedBox()),
+                  Expanded(
+                    flex: 14,
+                    child: Container(
+                      constraints: BoxConstraints(
+                          minWidth: MediaQuery.of(context).size.width,
+                          minHeight: MediaQuery.of(context).size.height * 0.8
+                      ),
+                      decoration: BoxDecoration(
+                          color: ColorTheme.Ghost_White,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black12,
+                              offset: Offset(0, -14.ss),
+                              blurRadius: 12.ss,)
+                          ],
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(35.ss),
+                              topRight: Radius.circular(35.ss))),
+                      child:
                       Column(
                         children: [
-                          Padding(
-                            padding: EdgeInsets.only(top: 30.ss, bottom: 2.ss),
-                            child: CircleAvatar(
-                              backgroundImage: const AssetImage(
-                                  'assets/hotels_images/profile_pic.webp'),
-                              radius: 60.ss,
-                            ),
-                          ),
-                          Text(
-                            'Chandan Sharma',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall!
-                                .copyWith(
+                          Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(top: 30.ss, bottom: 2.ss),
+                                child: CircleAvatar(
+                                  backgroundImage: const AssetImage(
+                                      'assets/hotels_images/profile_pic.webp'),
+                                  radius: 60.ss,
+                                ),
+                              ),
+                              Text(
+                                tenantName,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleSmall!
+                                    .copyWith(
                                     fontSize: 18,
                                     color: Colors.black,
                                     fontWeight: FontWeight.w600),
+                              ),
+                            ],
                           ),
+                          SizedBox(height: 10.ss,),
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 24.ss),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _profileButtons(iconPath: 'assets/icons/user_profile.webp', label: 'Edit Profile',onTap: (){},),
+                                    _profileButtons(iconPath: 'assets/icons/payments.webp', label: 'Payments',onTap: (){},),
+                                    Padding(padding: EdgeInsets.symmetric(vertical: 8.ss),
+                                        child: Text('Settings',style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Blue,fontWeight: FontWeight.w600),)),
+                                    _profileButtons(iconPath: 'assets/icons/notification-bell.webp', label: 'Notifications',onTap: (){},),
+                                    _profileButtons(iconPath: 'assets/icons/terms-and-conditions.webp', label: 'Terms & Conditions',onTap: (){},),
+                                    _profileButtons(iconPath: 'assets/icons/privacy-policy.webp', label: 'Privacy Police',onTap: (){},),
+                                    ListTile(
+                                      onTap: ()async{
+                                        var pref = await SharedPreferences.getInstance();
+                                        if(pref.containsKey(Consts.IS_LOGIN)){
+                                          pref.remove(Consts.IS_LOGIN);
+                                          pref.remove(Consts.TOKEN);
+                                          pref.remove(Consts.TENANT_NAME);
+                                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> const WelcomeScreen()),(route)=>false);
+                                        }
+                                      },
+                                      title: Text('Log Out',style: Theme.of(context).textTheme.titleSmall!.copyWith(color: ColorTheme.Blue,fontSize: 14.fss,fontWeight: FontWeight.w500),),
+                                      contentPadding: EdgeInsets.symmetric(horizontal: 12.ss),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
                         ],
                       ),
-                      SizedBox(height: 10.ss,),
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 24.ss),
-                          child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _profileButtons(iconPath: 'assets/icons/user_profile.webp', label: 'Edit Profile',onTap: (){},),
-                                _profileButtons(iconPath: 'assets/icons/payments.webp', label: 'Payments',onTap: (){},),
-                                Padding(padding: EdgeInsets.symmetric(vertical: 8.ss),
-                                child: Text('Settings',style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Blue,fontWeight: FontWeight.w600),)),
-                                _profileButtons(iconPath: 'assets/icons/notification-bell.webp', label: 'Notifications',onTap: (){},),
-                                _profileButtons(iconPath: 'assets/icons/terms-and-conditions.webp', label: 'Terms & Conditions',onTap: (){},),
-                                _profileButtons(iconPath: 'assets/icons/privacy-policy.webp', label: 'Privacy Police',onTap: (){},),
-                                ListTile(
-                                  onTap: ()async{
-                                    var pref = await SharedPreferences.getInstance();
-                                    if(pref.containsKey(Consts.IS_LOGIN)){
-                                      pref.remove(Consts.IS_LOGIN);
-                                      pref.remove(Consts.TOKEN);
-                                      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> const WelcomeScreen()),(route)=>false);
-                                    }
-                                  },
-                                  title: Text('Log Out',style: Theme.of(context).textTheme.titleSmall!.copyWith(color: ColorTheme.Blue,fontSize: 14.fss,fontWeight: FontWeight.w500),),
-                                  contentPadding: EdgeInsets.symmetric(horizontal: 12.ss),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ],
-          )),
+                ],
+              ));
+        }else{
+          return Center(child: CircularProgressIndicator(color: ColorTheme.Blue,),);
+        }
+      })
     );
   }
 }

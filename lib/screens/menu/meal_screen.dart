@@ -6,7 +6,6 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:rental_app/utilities/color_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
-
 import '../../model/consts.dart';
 
 class MealScreen extends StatefulWidget {
@@ -38,7 +37,7 @@ class _MealScreenStates extends State<MealScreen> {
      print('Response Body: ${response.body}');
 
      if(response.statusCode == 200){
-       tenantName = pref.getString(Consts.NAME) ?? 'unknown name';
+       tenantName = pref.getString(Consts.TENANT_NAME) ?? 'unknown name';
        Map<String, dynamic> decodedJson = json.decode(response.body);
        List<Map<String, dynamic>> mealsList =
        List<Map<String, dynamic>>.from(decodedJson['meal']);

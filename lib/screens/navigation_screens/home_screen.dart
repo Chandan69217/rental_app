@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:rental_app/custom_paints/circular_curve.dart';
 import 'package:rental_app/screens/menu/meal_screen.dart';
 import 'package:rental_app/screens/menu/notification_screen.dart';
@@ -8,7 +10,6 @@ import 'package:rental_app/screens/navigation_screens/fee_screen.dart';
 import 'package:rental_app/screens/navigation_screens/profile_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
-
 import '../../model/consts.dart';
 import '../../utilities/color_theme.dart';
 
@@ -18,344 +19,420 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenStates extends State<HomeScreen> {
-  late String tenantName;
   @override
   void initState() {
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(future: init(), builder: (context,snapshot){
-      if(snapshot.hasData){
-        return Scaffold(
-            appBar: AppBar(
-              title: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+        appBar: AppBar(
+          title: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Home',
+                style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                    fontSize: 16.fss,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w400),
+              ),
+              Row(
                 children: [
+                  Image.asset(
+                    'assets/icons/location_icon.webp',
+                    width: 20.ss,
+                    height: 20.ss,
+                    fit: BoxFit.cover,
+                  ),
+                  SizedBox(
+                    width: 5.ss,
+                  ),
                   Text(
-                    'Home',
+                    'Patna, Bihar',
                     style: Theme.of(context).textTheme.titleSmall!.copyWith(
                         fontSize: 16.fss,
                         color: Colors.black,
                         fontWeight: FontWeight.w400),
                   ),
-                  Row(
-                    children: [
-                      Image.asset(
-                        'assets/icons/location_icon.webp',
-                        width: 20.ss,
-                        height: 20.ss,
-                        fit: BoxFit.cover,
-                      ),
-                      SizedBox(
-                        width: 5.ss,
-                      ),
-                      Text(
-                        'Patna, Bihar',
-                        style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                            fontSize: 16.fss,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w400),
-                      ),
-                    ],
-                  )
                 ],
-              ),
-              actions: [
-                Padding(
-                  padding: EdgeInsets.only(right: 16.ss),
-                  child: InkWell(
-                      borderRadius: BorderRadius.circular(20.ss),
-                      overlayColor:
+              )
+            ],
+          ),
+          actions: [
+            Padding(
+              padding: EdgeInsets.only(right: 16.ss),
+              child: InkWell(
+                  borderRadius: BorderRadius.circular(20.ss),
+                  overlayColor:
                       WidgetStatePropertyAll(ColorTheme.Blue.withOpacity(0.1)),
-                      onTap: () {},
-                      child: Padding(
-                        padding: EdgeInsets.all(8.ss),
-                        child: Badge(
-                          child: Icon(Icons.notifications_none_rounded),
-                          label: Text('2'),
-                        ),
-                      )),
-                )
-              ],
-            ),
-            body: SafeArea(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(16.ss),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      // padding: EdgeInsets.all(24.ss),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: ColorTheme.Gray,
-                              blurRadius: 10.ss,
-                              spreadRadius: 3.ss,
-                            ),
-                          ],
-                          borderRadius: BorderRadius.circular(14.ss),
-                          color: ColorTheme.Blue.withOpacity(0.95)),
-                      child: CustomPaint(
-                        painter: CircularWave(
-                            waveColor: ColorTheme.Snow_white,
-                            waveHeight: 60,
-                            waveLength: 550,
-                            phaseShift: 1),
-                        child: Padding(
-                          padding: EdgeInsets.all(24.ss),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Hi, $tenantName',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyMedium!
-                                          .copyWith(color: ColorTheme.Snow_white),
-                                    ),
-                                    Text(
-                                      'Building: 12A | Room No: 56',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleSmall!
-                                          .copyWith(color: ColorTheme.Ghost_White),
-                                    ),
-                                    SizedBox(
-                                      height: 5.ss,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Image.asset(
-                                          'assets/icons/phone_outline.webp',
-                                          width: 17.ss,
-                                          height: 17.ss,
-                                          color: ColorTheme.Snow_white,
-                                        ),
-                                        SizedBox(
-                                          width: 5.ss,
-                                        ),
-                                        Text(
-                                          '8969893457',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleSmall!
-                                              .copyWith(
-                                              color: ColorTheme.Ghost_White),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 5.ss,
-                                    ),
-                                    Row(
-                                      children: [
-                                        Image.asset(
-                                          'assets/icons/id-card-icon.webp',
-                                          width: 20.ss,
-                                          height: 20.ss,
-                                          color: ColorTheme.Snow_white,
-                                        ),
-                                        SizedBox(
-                                          width: 5.ss,
-                                        ),
-                                        Text(
-                                          '821061985417',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleSmall!
-                                              .copyWith(
-                                              color: ColorTheme.Ghost_White),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                  onTap: () {},
+                  child: Padding(
+                    padding: EdgeInsets.all(8.ss),
+                    child: Badge(
+                      child: Icon(Icons.notifications_none_rounded),
+                      label: Text('2'),
+                    ),
+                  )),
+            )
+          ],
+        ),
+        body: FutureBuilder(
+            future: init(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return SafeArea(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.all(16.ss),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          // padding: EdgeInsets.all(24.ss),
+                          decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: ColorTheme.Gray,
+                                  blurRadius: 10.ss,
+                                  spreadRadius: 3.ss,
                                 ),
+                              ],
+                              borderRadius: BorderRadius.circular(14.ss),
+                              color: ColorTheme.Blue.withOpacity(0.95)),
+                          child: CustomPaint(
+                            painter: CircularWave(
+                                waveColor: ColorTheme.Snow_white,
+                                waveHeight: 60,
+                                waveLength: 550,
+                                phaseShift: 1),
+                            child: Padding(
+                              padding: EdgeInsets.all(24.ss),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Hi, ${snapshot.data![Consts.TENANT_NAME]}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyMedium!
+                                              .copyWith(
+                                                  color: ColorTheme.Snow_white),
+                                        ),
+                                        Text(
+                                          'Building: 12A | Room No: ${snapshot.data![Consts.ROOM_NO]}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleSmall!
+                                              .copyWith(
+                                                  color:
+                                                      ColorTheme.Ghost_White),
+                                        ),
+                                        SizedBox(
+                                          height: 5.ss,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Image.asset(
+                                              'assets/icons/phone_outline.webp',
+                                              width: 17.ss,
+                                              height: 17.ss,
+                                              color: ColorTheme.Snow_white,
+                                            ),
+                                            SizedBox(
+                                              width: 5.ss,
+                                            ),
+                                            Text(
+                                              snapshot
+                                                  .data!['tenantContactNumber'],
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleSmall!
+                                                  .copyWith(
+                                                      color: ColorTheme
+                                                          .Ghost_White),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 5.ss,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Image.asset(
+                                              'assets/icons/id-card-icon.webp',
+                                              width: 20.ss,
+                                              height: 20.ss,
+                                              color: ColorTheme.Snow_white,
+                                            ),
+                                            SizedBox(
+                                              width: 5.ss,
+                                            ),
+                                            Text(
+                                              '${snapshot.data!['hostelId']}',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleSmall!
+                                                  .copyWith(
+                                                      color: ColorTheme
+                                                          .Ghost_White),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  ClipRRect(
+                                      borderRadius:
+                                          BorderRadius.circular(50.ss),
+                                      child:
+                                          // Image.network(
+                                          //   snapshot.data!['tenantProfileImage'],
+                                          //   fit: BoxFit.cover,
+                                          //   width: 60.ss,
+                                          //   height: 60.ss,
+                                          // )
+                                          Image.asset(
+                                        'assets/hotels_images/profile_pic.webp',
+                                        fit: BoxFit.cover,
+                                        width: 60.ss,
+                                        height: 60.ss,
+                                      )),
+                                ],
                               ),
-                              ClipRRect(
-                                  borderRadius: BorderRadius.circular(50.ss),
-                                  child: Image.asset(
-                                    'assets/hotels_images/profile_pic.webp',
-                                    fit: BoxFit.cover,
-                                    width: 60.ss,
-                                    height: 60.ss,
-                                  )),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 15.ss,
-                    ),
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      padding:
-                      EdgeInsets.symmetric(horizontal: 24.ss, vertical: 10.ss),
-                      decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: ColorTheme.Gray,
-                              blurRadius: 10.ss,
-                              spreadRadius: 3.ss,
-                            ),
-                          ],
-                          borderRadius: BorderRadius.circular(14.ss),
-                          color: ColorTheme.Blue.withOpacity(0.95)),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('Due Amount: ',
-                              style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                  color: ColorTheme.Snow_white, fontSize: 10.fss)),
-                          Expanded(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Image.asset(
-                                  'assets/icons/rupee-icon.webp',
-                                  width: 12.ss,
-                                  height: 10.ss,
-                                  fit: BoxFit.cover,
-                                  color: ColorTheme.Snow_white,
+                        SizedBox(
+                          height: 15.ss,
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 24.ss, vertical: 10.ss),
+                          decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: ColorTheme.Gray,
+                                  blurRadius: 10.ss,
+                                  spreadRadius: 3.ss,
                                 ),
-                                Text(
-                                  '2300.00',
+                              ],
+                              borderRadius: BorderRadius.circular(14.ss),
+                              color: ColorTheme.Blue.withOpacity(0.95)),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('Due Amount: ',
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyMedium!
                                       .copyWith(
+                                          color: ColorTheme.Snow_white,
+                                          fontSize: 10.fss)),
+                              Expanded(
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/icons/rupee-icon.webp',
+                                      width: 12.ss,
+                                      height: 10.ss,
+                                      fit: BoxFit.cover,
                                       color: ColorTheme.Snow_white,
-                                      fontSize: 10.fss),
-                                )
-                              ],
-                            ),
+                                    ),
+                                    Text(
+                                      '2300.00',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium!
+                                          .copyWith(
+                                              color: ColorTheme.Snow_white,
+                                              fontSize: 10.fss),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 35.ss,
+                                child: ElevatedButton(
+                                    onPressed: () {},
+                                    child: const Text(
+                                      'Pay now',
+                                      style:
+                                          TextStyle(color: Colors.deepPurple),
+                                    )),
+                              )
+                            ],
                           ),
-                          SizedBox(
-                            height: 35.ss,
-                            child: ElevatedButton(
-                                onPressed: () {},
-                                child: const Text(
-                                  'Pay now',
-                                  style: TextStyle(color: Colors.deepPurple),
-                                )),
-                          )
-                        ],
-                      ),
-                    ),
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      padding: EdgeInsets.symmetric(vertical: 18.ss),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        borderRadius: BorderRadius.circular(14.ss),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(left: 12.ss),
-                            child: const Text(
-                              'Menu',
-                            ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          padding: EdgeInsets.symmetric(vertical: 18.ss),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.circular(14.ss),
                           ),
-                          SizedBox(
-                            height: 8.ss,
-                          ),
-                          GridView.count(
-                            crossAxisCount: 4,
-                            shrinkWrap: true,
-                            mainAxisSpacing: 14.ss,
-                            crossAxisSpacing: 12.ss,
-                            physics: const NeverScrollableScrollPhysics(),
-                            padding: EdgeInsets.symmetric(vertical: 4.ss),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              _MenuButton(
-                                iconPath: 'assets/icons/profile.webp',
-                                label: 'Profile',
-                                onTap: () =>
-                                    Navigator.of(context).push(MaterialPageRoute(
-                                        builder: (context) => ProfileScreen(
-                                          enableBack: true,
-                                        ))),
+                              Padding(
+                                padding: EdgeInsets.only(left: 12.ss),
+                                child: const Text(
+                                  'Menu',
+                                ),
                               ),
-                              _MenuButton(
-                                iconPath: 'assets/icons/food.webp',
-                                label: 'Meal',
-                                onTap: () => Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                        builder: (context) => MealScreen())),
+                              SizedBox(
+                                height: 8.ss,
                               ),
-                              _MenuButton(
-                                iconPath: 'assets/icons/attendant-list.webp',
-                                label: 'Attendance',
-                                onTap: () => Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                        builder: (context) => AttendanceScreen(enableBack: true,))),
-                              ),
-                              _MenuButton(
-                                iconPath: 'assets/icons/notice.webp',
-                                label: 'Notice',
-                                onTap: () => Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                        builder: (context) => NotificationScreen())),
-                              ),
-                              _MenuButton(
-                                iconPath: 'assets/icons/fee.webp',
-                                label: 'Fee',
-                                onTap: () =>
-                                    Navigator.of(context).push(MaterialPageRoute(
-                                        builder: (context) => FeeScreen(
-                                          enableBack: true,
-                                        ))),
-                              ),
-                              _MenuButton(
-                                iconPath: 'assets/icons/reminder.webp',
-                                label: 'Reminder',
-                                onTap: () {},
-                              ),
-                              _MenuButton(
-                                iconPath: 'assets/icons/support.webp',
-                                label: 'Helpdesk',
-                                onTap: () {},
-                              ),
-                              _MenuButton(
-                                iconPath: 'assets/icons/leave.webp',
-                                label: 'Leave',
-                                onTap: () {},
+                              GridView.count(
+                                crossAxisCount: 4,
+                                shrinkWrap: true,
+                                mainAxisSpacing: 14.ss,
+                                crossAxisSpacing: 12.ss,
+                                physics: const NeverScrollableScrollPhysics(),
+                                padding: EdgeInsets.symmetric(vertical: 4.ss),
+                                children: [
+                                  _MenuButton(
+                                    iconPath: 'assets/icons/profile.webp',
+                                    label: 'Profile',
+                                    onTap: () => Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                            builder: (context) => ProfileScreen(
+                                                  enableBack: true,
+                                                ))),
+                                  ),
+                                  _MenuButton(
+                                    iconPath: 'assets/icons/food.webp',
+                                    label: 'Meal',
+                                    onTap: () => Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                MealScreen())),
+                                  ),
+                                  _MenuButton(
+                                    iconPath:
+                                        'assets/icons/attendant-list.webp',
+                                    label: 'Attendance',
+                                    onTap: () => Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AttendanceScreen(
+                                                  enableBack: true,
+                                                ))),
+                                  ),
+                                  _MenuButton(
+                                    iconPath: 'assets/icons/notice.webp',
+                                    label: 'Notice',
+                                    onTap: () => Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                NotificationScreen())),
+                                  ),
+                                  _MenuButton(
+                                    iconPath: 'assets/icons/fee.webp',
+                                    label: 'Fee',
+                                    onTap: () => Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                            builder: (context) => FeeScreen(
+                                                  enableBack: true,
+                                                ))),
+                                  ),
+                                  _MenuButton(
+                                    iconPath: 'assets/icons/reminder.webp',
+                                    label: 'Reminder',
+                                    onTap: () {},
+                                  ),
+                                  _MenuButton(
+                                    iconPath: 'assets/icons/support.webp',
+                                    label: 'Helpdesk',
+                                    onTap: () {},
+                                  ),
+                                  _MenuButton(
+                                    iconPath: 'assets/icons/leave.webp',
+                                    label: 'Leave',
+                                    onTap: () {},
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            )
-        );
-      }else{
-        return Scaffold(body: Center(child: CircularProgressIndicator(color: ColorTheme.Blue,),),);
-      }
-    });
+                  ),
+                );
+              } else if(snapshot.hasError){
+                return Center(child: Padding(
+                  padding: EdgeInsets.all(16.ss),
+                  child: Text(snapshot.error.toString()),
+                ),);
+              }else {
+                return Center(
+                  child: CircularProgressIndicator(
+                    color: ColorTheme.Blue,
+                  ),
+                );
+              }
+            }));
   }
 
-  Future<bool> init()async {
-    tenantName = (await SharedPreferences.getInstance()).getString(Consts.NAME) ?? '';
-    return true;
+  Future<Map<String, dynamic>> init() async {
+    List<Map<String, dynamic>> tenantData = [];
+    var uri = Uri.parse(
+        'https://appadmin.atharvaservices.com/api/Tenant/tenantPProfile');
+    var pref = await SharedPreferences.getInstance();
+    var token = pref.getString(Consts.TOKEN) ?? '';
+    if (token.isEmpty) {
+      print('Token is empty');
+      return Future.error('User token is empty');
+    }
+    try {
+      var response = await get(uri, headers: {
+        Consts.AUTHORIZATION: 'Bearer $token',
+        Consts.CONTENT_TYPE: 'application/json'
+      });
+
+      if (response.statusCode == 200) {
+        var profileData = Map.from(json.decode(response.body)['profile']);
+        print("Received data from network: $profileData");
+        if (profileData.containsKey('tenant')) {
+          tenantData = List.from(profileData['tenant']);
+          if (tenantData[0].isNotEmpty) {
+            pref.setString(
+                Consts.TENANT_NAME, tenantData[0][Consts.TENANT_NAME]);
+            return tenantData[0];
+          } else {
+            print('tenant data is not present in the response body');
+            return Future.error('tenant data is not present');
+          }
+        } else {
+          print("Tenant name is missing in the response.");
+        }
+      } else {
+        print(
+            'Data cannot be fetched with response code: ${response.statusCode} reason: ${response.reasonPhrase}');
+        Future.error('Data cannot be fetched with response code: ${response.statusCode} reason: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Error occurred during network request: $e');
+      Future.error('Error occurred during network request: $e');
+    }
+    return tenantData[0];
   }
 }
 

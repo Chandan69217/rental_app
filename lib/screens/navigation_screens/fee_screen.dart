@@ -2,8 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:rental_app/model/due_amount.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
+import '../../model/consts.dart';
 import '../../utilities/color_theme.dart';
 
 class FeeScreen extends StatefulWidget {
@@ -15,10 +18,6 @@ class FeeScreen extends StatefulWidget {
 }
 
 class _FeeScreenStates extends State<FeeScreen> {
-  final List<Map<String, dynamic>> _fees = [
-    {'month_of': 'Feb 2024', 'fee': 2400.00},
-    {'month_of': 'March 2024', 'fee': 3200.00}
-  ];
   final Set<int> _getSelection = {};
   double _totalAmount = 0.00;
 
@@ -27,97 +26,97 @@ class _FeeScreenStates extends State<FeeScreen> {
     super.initState();
   }
 
-  Future<DueAmount> _getFeeDetails() async {
-    DueAmount dueAmount;
-    Map<String, dynamic> jsonData = json.decode(''' 
-    {
-    "id": 1,
-    "tenantName": "John Doe",
-    "roomNumber": "A-101",
-    "dueAmount": 500,
-    "dueDate": "2024-12-31",
-    "status":"unpaid"
+  Future<List<Map<String,dynamic>>> _getFeeDetails() async {
+    List<Map<String, dynamic>> payment = [];
+    var uri = Uri.parse(
+        'https://appadmin.atharvaservices.com/api/Fee/tenantMonthlyFee');
+    var pref = await SharedPreferences.getInstance();
+    var token = pref.getString(Consts.TOKEN) ?? '';
+    if (token.isEmpty) {
+      print('Token is empty');
+     // return Future.error('User token is empty');
     }
-    ''');
-    print('${jsonData.toString()}');
-    dueAmount = DueAmount.fromJson(jsonData);
+    try {
+      var response = await get(uri, headers: {
+        Consts.AUTHORIZATION: 'Bearer $token',
+        Consts.CONTENT_TYPE: 'application/json'
+      });
 
-    //   try{
-    //
-    //   }catch(exception,trace){
-    //     print('exception : $exception, trace : $trace');
-    //   }
-    return dueAmount;
+      if (response.statusCode == 200) {
+        var paymentsData = Map.from(json.decode(response.body));
+        print("Received data from network: $paymentsData");
+        if (paymentsData.containsKey('payments')) {
+          payment = List.from(paymentsData['payments']);
+          if (payment.isEmpty) {
+            print('payment data is not present in the response body');
+            return Future.error('payment data is not present');
+          }
+          return payment;
+        } else {
+          print("payment is missing in the response.");
+        }
+      }
+      else {
+        print(
+            'Data cannot be fetched with response code: ${response.statusCode} reason: ${response.reasonPhrase}');
+       return Future.error('Data cannot be fetched with response code: ${response.statusCode} reason: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Error occurred during network request: $e');
+      return Future.error('Error occurred during network request: $e');
+    }
+    return payment;
   }
+
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: _getFeeDetails(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Scaffold(
-              backgroundColor: ColorTheme.Blue,
-              appBar: AppBar(
-                backgroundColor: ColorTheme.Blue,
-                title: Column(
-                  children: [
-                    RichText(
-                      text: TextSpan(
-                          text: 'Pay Fee',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium!
-                              .copyWith(color: ColorTheme.Snow_white),
-                          children: [
-                            TextSpan(text: '\n'),
-                            TextSpan(
-                                text: 'Building: 12A | Room No: ${snapshot.data!.roomNumber}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .copyWith(
-                                        color: ColorTheme.Snow_white,
-                                        fontSize: 10.fss))
-                          ]),
-                    ),
-                  ],
-                ),
-                leading: IconButton(
-                    onPressed: () => widget.enableBack
-                        ? Navigator.pop(context)
-                        : widget.onBackPressed!(),
-                    icon: const Icon(
-                      Icons.keyboard_arrow_left_outlined,
-                      color: ColorTheme.Snow_white,
-                    )),
-              ),
-              body: SafeArea(
-                  child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  const Expanded(flex: 1, child: SizedBox()),
-                  Expanded(
-                    flex: 14,
-                    child: Container(
-                      constraints: BoxConstraints(
-                        minWidth: MediaQuery.of(context).size.width,
-                      ),
-                      padding: EdgeInsets.only(
-                          left: 24.ss, right: 24.ss, top: 35.ss),
-                      decoration: BoxDecoration(
-                          color: ColorTheme.Ghost_White,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black12,
-                              offset: Offset(0, -14.ss),
-                              blurRadius: 12.ss,
-                            ),
-                          ],
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(35.ss),
-                              topRight: Radius.circular(35.ss))),
-                      child: Column(
+    return Scaffold(
+      backgroundColor: ColorTheme.Blue,
+      appBar: AppBar(
+        backgroundColor: ColorTheme.Blue,
+        title: Text('Pay Fee',
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium!
+              .copyWith(color: ColorTheme.Snow_white),),
+        leading: IconButton(
+            onPressed: () => widget.enableBack
+                ? Navigator.pop(context)
+                : widget.onBackPressed!(),
+            icon: const Icon(
+              Icons.keyboard_arrow_left_outlined,
+              color: ColorTheme.Snow_white,
+            )),
+      ),
+      body: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              const Expanded(flex: 1, child: SizedBox()),
+              Expanded(
+                flex: 14,
+                child: Container(
+                  constraints: BoxConstraints(
+                    minWidth: MediaQuery.of(context).size.width,
+                  ),
+                  padding: EdgeInsets.only(
+                      left: 24.ss, right: 24.ss, top: 35.ss),
+                  decoration: BoxDecoration(
+                      color: ColorTheme.Ghost_White,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          offset: Offset(0, -14.ss),
+                          blurRadius: 12.ss,
+                        ),
+                      ],
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(35.ss),
+                          topRight: Radius.circular(35.ss))),
+                  child: FutureBuilder(future: _getFeeDetails(), builder: (context,snapshot){
+                    if(snapshot.hasData){
+                      return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
@@ -126,25 +125,25 @@ class _FeeScreenStates extends State<FeeScreen> {
                                 text: TextSpan(
                                     text: 'Payments',
                                     style:
-                                        Theme.of(context).textTheme.bodyMedium,
+                                    Theme.of(context).textTheme.bodyMedium,
                                     children: [
-                                  const TextSpan(text: '\n'),
-                                  TextSpan(
-                                      text: 'Select dues payments',
-                                      style:
+                                      const TextSpan(text: '\n'),
+                                      TextSpan(
+                                          text: 'Select dues payments',
+                                          style:
                                           Theme.of(context).textTheme.bodySmall)
-                                ])),
+                                    ])),
                           ),
                           Expanded(
                             child: ListView.builder(
-                                itemCount: 2,
+                                itemCount: snapshot.data!.length,
                                 shrinkWrap: true,
                                 itemBuilder: (context, index) {
                                   return _FeeExpansionTile(
-                                      fees: _fees[index],
+                                      fees:snapshot.data![index],
                                       toggle: _getSelection.contains(index),
                                       onChanged: (value) {
-                                        _toggleSelection(index);
+                                        _toggleSelection(index,snapshot.data![index]['feeAmount']);
                                       });
                                 }),
                           ),
@@ -162,23 +161,23 @@ class _FeeScreenStates extends State<FeeScreen> {
                                 style: ButtonStyle(
                                     elevation: const WidgetStatePropertyAll(0),
                                     backgroundColor:
-                                        const WidgetStatePropertyAll(
-                                            ColorTheme.Blue),
+                                    const WidgetStatePropertyAll(
+                                        ColorTheme.Blue),
                                     shape: WidgetStatePropertyAll(
                                       RoundedRectangleBorder(
                                         borderRadius:
-                                            BorderRadius.circular(50.ss),
+                                        BorderRadius.circular(50.ss),
                                       ),
                                     )),
                                 child: Padding(
                                   padding:
-                                      EdgeInsets.symmetric(vertical: 14.ss),
+                                  EdgeInsets.symmetric(vertical: 14.ss),
                                   child: Center(
                                     child: Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      MainAxisAlignment.center,
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                      CrossAxisAlignment.center,
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
                                         Text(
@@ -187,9 +186,9 @@ class _FeeScreenStates extends State<FeeScreen> {
                                               .textTheme
                                               .bodyMedium!
                                               .copyWith(
-                                                color: ColorTheme.Snow_white,
-                                                fontSize: 14.fss,
-                                              ),
+                                            color: ColorTheme.Snow_white,
+                                            fontSize: 14.fss,
+                                          ),
                                         ),
                                         Image.asset(
                                           'assets/icons/rupee-icon.webp',
@@ -204,9 +203,9 @@ class _FeeScreenStates extends State<FeeScreen> {
                                               .textTheme
                                               .bodyMedium!
                                               .copyWith(
-                                                fontSize: 14.fss,
-                                                color: ColorTheme.Snow_white,
-                                              ),
+                                            fontSize: 14.fss,
+                                            color: ColorTheme.Snow_white,
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -216,37 +215,27 @@ class _FeeScreenStates extends State<FeeScreen> {
                             ),
                           ),
                         ],
-                      ),
-                    ),
-                  ),
-                ],
-              )),
-            );
-          } else if(snapshot.hasError){
-            return Scaffold(
-              body: Center(
-                child: Text('${snapshot.error.toString()}')
-              ),
-            );
-          }else {
-            return Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(
-                  color: ColorTheme.Blue,
+                      );
+                    }else if(snapshot.hasError){
+                      return Center(child: Padding(padding: EdgeInsets.all(16.ss),child: Text(snapshot.error.toString()),),);
+                    }else{
+                      return Center(child: CircularProgressIndicator(color: ColorTheme.Blue,),);
+                    }
+                  })
                 ),
               ),
-            );
-          }
-        });
+            ],
+          )),
+    );
   }
 
-  _toggleSelection(int index) {
+  _toggleSelection(int index, int amount) {
     setState(() {
       if (_getSelection.contains(index)) {
-        _totalAmount -= _fees[index]['fee'];
+       _totalAmount -= amount;
         _getSelection.remove(index);
       } else {
-        _totalAmount += _fees[index]['fee'];
+       _totalAmount += amount;
         _getSelection.add(index);
       }
       if (_getSelection.isEmpty) {
@@ -254,6 +243,8 @@ class _FeeScreenStates extends State<FeeScreen> {
       }
     });
   }
+
+
 }
 
 class _FeeExpansionTile extends StatelessWidget {
@@ -279,10 +270,10 @@ class _FeeExpansionTile extends StatelessWidget {
               value: toggle,
               activeColor: ColorTheme.Blue,
               onChanged: onChanged),
-          title: Text(fees['month_of'],
+          title: Text(fees['monthName'],
               style: Theme.of(context).textTheme.bodyMedium),
           subtitle: _expansionChildrenTile(
-              rupees: fees['fee'], title: 'Total Amount'),
+              rupees: fees['feeAmount'], title: 'Total Amount'),
           expandedAlignment: Alignment.centerLeft,
           childrenPadding:
               EdgeInsets.symmetric(horizontal: 16.ss, vertical: 5.ss),
@@ -304,10 +295,10 @@ class _FeeExpansionTile extends StatelessWidget {
                 ),
               )
             ]),
-            _expansionChildrenTile(rupees: fees['fee'], title: 'Rent'),
-            _expansionChildrenTile(rupees: fees['fee'], title: 'Electricity'),
-            _expansionChildrenTile(rupees: fees['fee'], title: 'Water'),
-            _expansionChildrenTile(rupees: fees['fee'], title: 'Fooding'),
+            _expansionChildrenTile(rupees: fees['details']['rent'], title: 'Rent'),
+            _expansionChildrenTile(rupees: fees['details']['electricity'], title: 'Electricity'),
+            _expansionChildrenTile(rupees: fees['details']['water'], title: 'Water'),
+            // _expansionChildrenTile(rupees: fees['details'][''], title: 'Fooding'),
             SizedBox(
               height: 5.ss,
             )
@@ -319,7 +310,7 @@ class _FeeExpansionTile extends StatelessWidget {
 }
 
 class _expansionChildrenTile extends StatelessWidget {
-  final double rupees;
+  final int rupees;
   final String title;
   const _expansionChildrenTile({required this.rupees, required this.title});
   @override
@@ -343,7 +334,7 @@ class _expansionChildrenTile extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
               Text(
-                '$rupees',
+                '${double.parse(rupees.toString())}',
                 style: Theme.of(context)
                     .textTheme
                     .bodyMedium!

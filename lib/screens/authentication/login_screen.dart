@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
@@ -8,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
 import 'package:rental_app/model/consts.dart';
-import 'package:rental_app/model/dummy_json.dart';
 import 'package:rental_app/screens/authentication/forgot_screen.dart';
 import 'package:rental_app/screens/authentication/signup_screen.dart';
 import 'package:rental_app/screens/dashboard.dart';

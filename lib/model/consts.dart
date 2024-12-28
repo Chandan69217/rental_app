@@ -13,7 +13,7 @@ class Consts {
   static const String DUE_AMOUNT = 'dueAmount';
   static const String ID = 'id';
   static const String TENANT_NAME = 'tenantName';
-  static const String ROOM_NO = 'roomNumber';
+  static const String ROOM_NO = 'tenantRoomNumber';
   static const String DUE_DATE = 'dueDate';
   static const String PROFILE = 'profile';
   static const String CONTACT_NUMBER = 'contactNumber';

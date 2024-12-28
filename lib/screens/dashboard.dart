@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rental_app/screens/navigation_screens/attendance_screen.dart';
 import 'package:rental_app/screens/navigation_screens/fee_screen.dart';
-import 'package:rental_app/screens/navigation_screens/booking_screen.dart';
 import 'package:rental_app/screens/navigation_screens/home_screen.dart';
 import 'package:rental_app/screens/navigation_screens/profile_screen.dart';
 import 'package:rental_app/utilities/color_theme.dart';

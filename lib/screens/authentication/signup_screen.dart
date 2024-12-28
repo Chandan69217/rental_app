@@ -12,7 +12,6 @@ import 'package:sizing/sizing.dart';
 import '../../model/consts.dart';
 import '../../utilities/color_theme.dart';
 import '../../widgets/circular_icon_button.dart';
-import '../dashboard.dart';
 
 class SignupScreen extends StatefulWidget {
   @override

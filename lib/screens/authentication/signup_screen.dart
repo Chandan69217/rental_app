@@ -44,7 +44,9 @@ class _SignupScreenStates extends State<SignupScreen> with WidgetsBindingObserve
     super.didChangeMetrics();
     if(MediaQuery.of(context).viewInsets.bottom != 0 ){
       if(View.of(context).viewInsets.bottom == 0){
-
+        _nameFocusNode.unfocus();
+        _mobileFocusNode.unfocus();
+        _passwordFocusNode.unfocus();
       }
     }
   }
@@ -208,10 +210,6 @@ class _SignupScreenStates extends State<SignupScreen> with WidgetsBindingObserve
     String password = _passwordTxtController.text;
     final List<ConnectivityResult> connectivityResult = await Connectivity().checkConnectivity();
 
-    setState(() {
-      _isLoading = true;
-    });
-    
     if(name.isEmpty){
       _nameFocusNode.requestFocus();
       return;
@@ -227,11 +225,13 @@ class _SignupScreenStates extends State<SignupScreen> with WidgetsBindingObserve
       return;
     }
 
+    setState(() {
+      _isLoading = true;
+    });
 
     if(connectivityResult.contains(ConnectivityResult.mobile)||connectivityResult.contains(ConnectivityResult.wifi)||connectivityResult.contains(ConnectivityResult.ethernet)){
       try{
         var uri = Uri.parse('https://appadmin.atharvaservices.com/api/Register/UserRegister');
-
         var body = json.encode({
           Consts.USER_NAME: name,
           Consts.MOBILE: mobile,
@@ -263,7 +263,8 @@ class _SignupScreenStates extends State<SignupScreen> with WidgetsBindingObserve
       }catch(exception,trace){
         print('exception : $exception, trace : $trace');
       }
-    }else{
+    }
+    else{
       Fluttertoast.showToast(msg: 'check your internet connection',);
     }
     

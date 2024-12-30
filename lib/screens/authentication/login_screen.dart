@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -15,12 +14,11 @@ import 'package:rental_app/widgets/custom_button.dart';
 import 'package:rental_app/widgets/custom_textfield.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
-
 import '../../utilities/color_theme.dart';
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
-
   @override
   State<StatefulWidget> createState() => _LoginScreenStates();
 }
@@ -197,6 +195,7 @@ class _LoginScreenStates extends State<LoginScreen>
               ),
             ),
           ),
+
           Padding(
             padding: EdgeInsets.symmetric(vertical: 10.ss),
             child: RichText(
@@ -227,6 +226,7 @@ class _LoginScreenStates extends State<LoginScreen>
                   ]),
             ),
           ),
+
         ],
       )),
     );
@@ -255,7 +255,7 @@ class _LoginScreenStates extends State<LoginScreen>
       _isLoading = true;
     });
     if(connectivityResult.contains(ConnectivityResult.mobile)||connectivityResult.contains(ConnectivityResult.wifi)||connectivityResult.contains(ConnectivityResult.ethernet)){
-      try {
+      try{
         var uri = Uri.parse('https://appadmin.atharvaservices.com/api/LoginCheck/login');
 
         var body = json.encode({
@@ -270,11 +270,11 @@ class _LoginScreenStates extends State<LoginScreen>
         var rawData = json.decode(response.body);
 
         if (response.statusCode == 200 && rawData[Consts.STATUS] == "success") {
-          final pref = await SharedPreferences.getInstance();
-          pref.setBool(Consts.IS_LOGIN, true);
-          pref.setString(Consts.TOKEN, rawData[Consts.DATA][Consts.TOKEN]);
-          pref.setString(Consts.NAME, rawData[Consts.DATA][Consts.NAME]);
-          Navigator.of(context).pushAndRemoveUntil(
+         final pref = await SharedPreferences.getInstance();
+         pref.setBool(Consts.IS_LOGIN, true);
+         pref.setString(Consts.TOKEN, rawData[Consts.DATA][Consts.TOKEN]);
+         pref.setString(Consts.NAME, rawData[Consts.DATA][Consts.NAME]);
+         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(builder: (context) => Dashboard()),
                 (route) => false,
           );
@@ -284,7 +284,8 @@ class _LoginScreenStates extends State<LoginScreen>
       } catch (exception, trace) {
         print('Exception : $exception , Trace : $trace');
       }
-    }else{
+    }
+    else{
       Fluttertoast.showToast(msg: 'check your internet connection',);
     }
 

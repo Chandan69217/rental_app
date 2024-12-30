@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
-import 'package:rental_app/model/due_amount.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
 import '../../model/consts.dart';
@@ -34,7 +33,7 @@ class _FeeScreenStates extends State<FeeScreen> {
     var token = pref.getString(Consts.TOKEN) ?? '';
     if (token.isEmpty) {
       print('Token is empty');
-     // return Future.error('User token is empty');
+     return Future.error('User token is empty');
     }
     try {
       var response = await get(uri, headers: {

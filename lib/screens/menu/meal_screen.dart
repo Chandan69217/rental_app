@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:rental_app/utilities/color_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,8 +16,11 @@ class MealScreen extends StatefulWidget {
 }
 
 class _MealScreenStates extends State<MealScreen> {
-  final bool isEnabled = false;
-  String tenantName = 'unknown name';
+  final bool _isEnabled = false;
+  String _tenantName = 'unknown name';
+  bool _breakfastBtnVisibility = false;
+  bool _lunchBtnVisibility = false;
+  bool _dinnerBtnVisibility = false;
 
   Future<List<Map<String, dynamic>>>? _getMealsData() async {
     var uri = Uri.parse('https://appadmin.atharvaservices.com/api/Meal/tenantMeal');
@@ -33,14 +38,15 @@ class _MealScreenStates extends State<MealScreen> {
        Consts.CONTENT_TYPE: 'application/json',
      });
 
-     print('Status Code: ${response.statusCode}');
-     print('Response Body: ${response.body}');
+     // print('Status Code: ${response.statusCode}');
+     // print('Response Body: ${response.body}');
 
      if(response.statusCode == 200){
-       tenantName = pref.getString(Consts.TENANT_NAME) ?? 'unknown name';
+       _tenantName = pref.getString(Consts.TENANT_NAME) ?? 'unknown name';
        Map<String, dynamic> decodedJson = json.decode(response.body);
        List<Map<String, dynamic>> mealsList =
        List<Map<String, dynamic>>.from(decodedJson['meal']);
+       _checkVisitingTiming(mealsList);
        return mealsList;
      }else{
        print('Request failed with status: ${response.statusCode}');
@@ -50,6 +56,47 @@ class _MealScreenStates extends State<MealScreen> {
      print('Exception : $exception , Trace : $trace');
      return [];
    }
+  }
+
+  void _checkVisitingTiming(List<Map<String,dynamic>> mealData) async{
+    _checkMealTime(mealData);
+    Timer.periodic(Duration(minutes: 1), (timer){
+      _checkMealTime(mealData);
+    });
+  }
+  void _checkMealTime(List<Map<String,dynamic>> mealData){
+    setState(() {
+      DateTime currentTime = DateTime.now();
+      DateTime breakfastStatingTime = _parseFormatedTime(mealData[0]['mealStartTime'], currentTime);
+      DateTime breakfastEndingTime = _parseFormatedTime(mealData[0]['mealEndtime'], currentTime);
+      DateTime lunchStatingTime = _parseFormatedTime(mealData[1]['mealStartTime'], currentTime);
+      DateTime lunchEndingTime = _parseFormatedTime(mealData[1]['mealEndtime'], currentTime);
+      DateTime dinnerStatingTime = _parseFormatedTime(mealData[2]['mealStartTime'], currentTime);
+      DateTime dinnerEndingTime = _parseFormatedTime(mealData[2]['mealEndtime'], currentTime);
+      if(currentTime.isAfter(breakfastStatingTime) && currentTime.isBefore(breakfastEndingTime)){
+        _breakfastBtnVisibility = true;
+      }else{
+        _breakfastBtnVisibility = false;
+      }
+
+      if(currentTime.isAfter(lunchStatingTime) && currentTime.isBefore(lunchEndingTime)){
+        _lunchBtnVisibility = true;
+      }else{
+        _lunchBtnVisibility = false;
+      }
+
+      if(currentTime.isAfter(dinnerStatingTime) && currentTime.isBefore(dinnerEndingTime)){
+        _dinnerBtnVisibility = true;
+      }else{
+        _dinnerBtnVisibility = false;
+      }
+    });
+  }
+
+  DateTime _parseFormatedTime(String formatTime,DateTime refDateTime ){
+    DateFormat format = DateFormat('h:mm a');
+    DateTime parsedTime = format.parse(formatTime);
+    return DateTime(refDateTime.year,refDateTime.month,refDateTime.day,parsedTime.hour,parsedTime.minute);
   }
 
   @override
@@ -80,30 +127,40 @@ class _MealScreenStates extends State<MealScreen> {
                       _MealTile(
                         onClick: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => _VisitScreen(mealsDetails: snapshot.data![0],tenantName: tenantName,)));
+                              builder: (context) => _VisitScreen(mealsDetails: snapshot.data![0],tenantName: _tenantName,)));
                         },
                         title: 'Breakfast',
                         subTitle: snapshot.hasData ? 'get your breakfast between ${snapshot.data![0]['mealStartTime']} to ${snapshot.data![0]['mealEndtime']}' : '',
                         loading: snapshot.hasData,
+                        enabled: _breakfastBtnVisibility
+                        //snapshot.hasData ? snapshot.data![0][Consts.STATUS] == Consts.ACTIVE ? true : false : false
                       ),
                       SizedBox(
                         height: 18.ss,
                       ),
                       _MealTile(
-                        onClick: () {},
+                        onClick: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => _VisitScreen(mealsDetails: snapshot.data![1],tenantName: _tenantName,)));
+                        },
                         title: 'Lunch',
                         subTitle: snapshot.hasData ? 'get your lunch between ${snapshot.data![1]['mealStartTime']} to ${snapshot.data![1]['mealEndtime']}' : '',
-                        enabled: false,
+                        enabled:  _lunchBtnVisibility,
+                        //snapshot.hasData ? snapshot.data![1][Consts.STATUS] == Consts.ACTIVE ? true : false : false,
                         loading: snapshot.hasData,
                       ),
                       SizedBox(
                         height: 18.ss,
                       ),
                       _MealTile(
-                        onClick: () {},
+                        onClick: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => _VisitScreen(mealsDetails: snapshot.data![2],tenantName: _tenantName,)));
+                        },
                         title: 'Dinner',
                         subTitle: snapshot.hasData ? 'get your dinner between ${snapshot.data![2]['mealStartTime']} to ${snapshot.data![2]['mealEndtime']}' : '',
-                        enabled: false,
+                        enabled:  _dinnerBtnVisibility,
+                        //snapshot.hasData ? snapshot.data![2][Consts.STATUS] == Consts.ACTIVE ? true : false : false,
                         loading: snapshot.hasData,
                       ),
                     ],
@@ -218,6 +275,7 @@ class _VisitScreen extends StatelessWidget {
   final Map<String,dynamic> mealsDetails;
   final String tenantName;
   _VisitScreen({required this.mealsDetails,required this.tenantName});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -243,14 +301,14 @@ class _VisitScreen extends StatelessWidget {
                 alignment: Alignment.center,
                 children: [
                   Opacity(
-                    opacity: 0.5,
+                    opacity: mealsDetails[Consts.STATUS] == Consts.ACTIVE ? 1: 0.5,
                     child: QrImageView(
                       data: mealsDetails.toString(),
                       version: QrVersions.auto,
                       size: MediaQuery.of(context).size.width * 0.7,
                     ),
                   ),
-                  Transform.rotate(angle: -0.8,child: Image.asset('assets/icons/taken_txt.webp',width: 270,height: 270,color: Colors.red,))
+                  Visibility(visible:mealsDetails[Consts.STATUS] == Consts.INACTIVE ,child: Transform.rotate(angle: -0.8,child: Image.asset('assets/icons/taken_txt.webp',width: 270,height: 270,color: Colors.red,)))
                 ],
               ),
               // Expanded(child: Text('scan',style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Blue,fontWeight: FontWeight.bold,fontSize: 12.fss),))

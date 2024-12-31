@@ -120,7 +120,7 @@ class _HomeScreenStates extends State<HomeScreen> {
   Future<Map<String, dynamic>> init() async {
     List<Map<String, dynamic>> tenantData = [];
     var uri = Uri.parse(
-        'https://appadmin.atharvaservices.com/api/Tenant/tenantPProfile');
+        'https://appadmin.atharvaservices.com/api/Tenant/tenantProfile');
     var pref = await SharedPreferences.getInstance();
     var token = pref.getString(Consts.TOKEN) ?? '';
     if (token.isEmpty) {
@@ -152,14 +152,14 @@ class _HomeScreenStates extends State<HomeScreen> {
       } else {
         print(
             'Data cannot be fetched with response code: ${response.statusCode} reason: ${response.reasonPhrase}');
-        Future.error(
-            'Data cannot be fetched with response code: ${response.statusCode} reason: ${response.reasonPhrase}');
+       Future.error(
+           'Data cannot be fetched with response code: ${response.statusCode} reason: ${response.reasonPhrase}');
       }
     } catch (e) {
       print('Error occurred during network request: $e');
-      Future.error('Error occurred during network request: $e');
+     Future.error('Error occurred during network request: $e');
     }
-    return tenantData[0];
+    return Future.error('Data Not Present');
   }
 }
 
@@ -246,7 +246,7 @@ class _CardDetails extends StatelessWidget {
                           .copyWith(color: ColorTheme.Snow_white),
                     ),
                     Text(
-                      'Building: 12A | Room No: ${snapshot[Consts.ROOM_NO]}',
+                      'Building: ${snapshot['tenantBuildingNumber']} | Room No: ${snapshot[Consts.ROOM_NO]}',
                       style: Theme.of(context)
                           .textTheme
                           .titleSmall!
@@ -290,7 +290,7 @@ class _CardDetails extends StatelessWidget {
                           width: 5.ss,
                         ),
                         Text(
-                          '${snapshot['hostelId']}',
+                          '${snapshot['tenantIDProofNumber']}',
                           style: Theme.of(context)
                               .textTheme
                               .titleSmall!

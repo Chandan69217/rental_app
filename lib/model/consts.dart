@@ -29,8 +29,8 @@ class Consts {
   static const String BREAKFAST = 'Breakfast';
   static const String LUNCH = 'lunch';
   static const String DINNER = 'dinner';
-  static const String ACTIVE = 'active';
-  static const String INACTIVE = 'inactive';
+  static const String ACTIVE = 'Active';
+  static const String INACTIVE = 'Inactive';
   static const String AUTHORIZATION = 'authorization';
   static const String MEAL_NAME = 'mealName';
 }

@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +8,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:rental_app/custom_paints/rect_painter.dart';
 import 'package:rental_app/model/consts.dart';
 import 'package:rental_app/utilities/permission_handler.dart';
@@ -28,7 +26,6 @@ class AttendanceScreen extends StatefulWidget {
 
 class _FeeScreenStates extends State<AttendanceScreen> {
   bool _punchBtnLoading = false;
-  bool switchValue = false;
   String _token = 'N/A';
   LocationPermissionStatus permissionStatus = LocationPermissionStatus.denied;
 
@@ -71,6 +68,7 @@ class _FeeScreenStates extends State<AttendanceScreen> {
 
       body: FutureBuilder(future: _getAttendance(), builder: (context,snapshot){
         bool hasData = snapshot.hasData ? true : snapshot.hasError ? false : false;
+        final lastAttendance = hasData? snapshot.data!['lastAttendance'] : [];
         return SafeArea(
             child: Padding(
               padding: EdgeInsets.all(16.ss),
@@ -78,14 +76,14 @@ class _FeeScreenStates extends State<AttendanceScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _punchCard(),
+                  _punchCard(hasData ? snapshot.data!['lastAttendanceStatus']:{}),
                   SizedBox(height: 10.ss,),
                   const Text('Last Attendance',textAlign: TextAlign.start,),
                   Expanded(
                       child: Container(
                         padding: EdgeInsets.symmetric(vertical:  12.ss),
                         child: hasData && snapshot.data!.isNotEmpty ? ListView.builder(
-                            itemCount: snapshot.data!.length,
+                            itemCount: lastAttendance.length,
                             shrinkWrap: true,
                             itemBuilder: (context, index) => Padding(
                               padding: EdgeInsets.symmetric(vertical: 5.ss,horizontal: 5.ss),
@@ -113,7 +111,7 @@ class _FeeScreenStates extends State<AttendanceScreen> {
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              Text('In : ${snapshot.data![index]['attendanceTime']}',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),),
+                                              Text('In : ${lastAttendance[index]['attendanceTime']}',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),),
                                               Text('Out : N/A',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),),
                                             ],
                                           ),
@@ -135,7 +133,11 @@ class _FeeScreenStates extends State<AttendanceScreen> {
     );
   }
 
-  Widget _punchCard() {
+  Widget _punchCard(Map<String,dynamic> value) {
+    final status = value.isNotEmpty ? value[Consts.STATUS] :'error';
+    final lastStatus = status == 'Success' ? value['data']['lastStatus'] : 'N/A';
+    final attendanceTimeIn = status == 'Success'? lastStatus == 'IN' ? value['data']['attendanceTime'] : 'N/A':'N/A';
+    final attendanceTimeOut = status == 'Success'? lastStatus == 'OUT' ? value['data']['attendanceTime'] : 'N/A':'N/A';
     return Container(
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
@@ -152,140 +154,89 @@ class _FeeScreenStates extends State<AttendanceScreen> {
       child: CustomPaint(
         painter: CircularWave(
             waveColor: ColorTheme.Snow_white,
-            waveHeight: 60,
+            waveHeight: 32,
             waveLength: 550,
             phaseShift: 1),
         child: Padding(
           padding: EdgeInsets.all(12.ss),
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+          child: status == 'error' ? const Center(child: CircularProgressIndicator(color: ColorTheme.Snow_white,)):Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ClipRRect(
-                        borderRadius: BorderRadius.circular(50.ss),
-                        child: Image.asset(
-                          'assets/hotels_images/profile_pic.webp',
-                          fit: BoxFit.cover,
-                          width: 50.ss,
-                          height: 50.ss,
-                        )),
-                    SizedBox(
-                      width: 10.ss,
+                    Text(
+                      'In : ${attendanceTimeIn}',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall!
+                          .copyWith(color: ColorTheme.Snow_white),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Chandan Sharma',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium!
-                              .copyWith(color: ColorTheme.Snow_white),
-                        ),
-                        Text(
-                          'Building: 12A | Room No: 56',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleSmall!
-                              .copyWith(color: ColorTheme.Ghost_White),
-                        ),
-                        SizedBox(
-                          height: 5.ss,
-                        ),
-                      ],
-                    ),
+                    Text('Out : ${attendanceTimeOut}',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall!
+                            .copyWith(color: ColorTheme.Snow_white)),
                   ],
                 ),
-                SizedBox(
-                  height: 8.ss,
-                ),
-                Padding(
-                    padding: EdgeInsets.only(left: 8.ss),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'In : 23-Dec-2024 11:17 AM',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall!
-                                    .copyWith(color: ColorTheme.Snow_white),
-                              ),
-                              Text('Out : N/A',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodySmall!
-                                      .copyWith(color: ColorTheme.Snow_white)),
-                            ],
-                          ),
-                        ),
-                        _punchBtnLoading ? Expanded(child: Center(child: SizedBox(width:25.ss,height:25.ss,child: CircularProgressIndicator(color: ColorTheme.Snow_white,strokeWidth: 3,)))) :
-                        Expanded(
-                          child:  FlutterSwitch(
-                            width: 125.0,
-                            height: 55.0,
-                            valueFontSize: 25.0,
-                            toggleSize: 45.0,
-                            value: switchValue,
-                            borderRadius: 30.0,
-                            padding: 8.0,
-                            showOnOff: true,
-                            onToggle: _markAttendance
-                          ),
-                        ),
-                          // child: ElevatedButton(
-                          //   onPressed: _markAttendance,
-                          //   style: const ButtonStyle(
-                          //       backgroundColor:
-                          //       WidgetStatePropertyAll(Colors.red),
-                          //       foregroundColor: WidgetStatePropertyAll(
-                          //           ColorTheme.Snow_white)),
-                          //   child: Text('Punch Out'),
-                          // ),
-                      ],
-                    ))
-              ]),
+              ),
+              if (_punchBtnLoading) Expanded(child: Center(child: SizedBox(width:25.ss,height:25.ss,child: const CircularProgressIndicator(color: ColorTheme.Snow_white,strokeWidth: 3,)))) else FlutterSwitch(
+                width: 120.ss,
+                height: 40,
+                value: lastStatus == 'IN' ? true:false,
+                borderRadius: 30.0,
+                showOnOff: true,
+                padding: 8.ss,
+                activeText: 'Out',
+                inactiveText: 'In',
+                inactiveColor: Colors.green,
+                activeColor: Colors.red,
+                activeTextFontWeight: FontWeight.normal,
+                inactiveTextFontWeight: FontWeight.normal,
+                valueFontSize: 18.fss,
+                activeIcon: Icon(Icons.arrow_back_rounded),
+                inactiveIcon: Icon(Icons.arrow_forward_rounded),
+                onToggle: _markAttendance
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Future<bool> _markAttendance(bool switchValue) async{
+  Future<void> _markAttendance(bool value) async{
     setState(() {
       _punchBtnLoading = true;
     });
     if( permissionStatus == LocationPermissionStatus.granted){
       var location = await Geolocator.getCurrentPosition(locationSettings: LocationSettings(accuracy: LocationAccuracy.high));
       if(!location.isMocked){
-        Map<String,dynamic> body = {
+        final body = jsonEncode({
           "id": "1",
           "hostelId":"1",
           "tenantId": "1",
-          "latitude": "25.2612368768767867",
-          "longitude": "85.823628768687678",
-          "attendanceTime": "1:23 PM",
-          "status": "OUT"
-        };
+          "latitude": "${location.latitude}",
+          "longitude": "${location.longitude}",
+          "attendanceTime": "${DateFormat('h:mm a').format(DateTime.now())}",
+          "status": value ? "IN" : "OUT"
+        }) ;
         print(_token);
         Map<String,String> headers = {
-          Consts.AUTHORIZATION : 'Bearer $_token',
+          'Content-Type': 'application/json',  // Set Content-Type header
+          'Authorization': 'Bearer $_token',
         };
 
         try{
-          Uri url = Uri.parse('https://appadmin.atharvaservices.com/api/Attendance/tenantAttendance');
-          var response = await post(url,headers: headers,body: body,);
+          final url = Uri.parse(
+              'https://appadmin.atharvaservices.com/api/Attendance/tenantAttendance');
+          final response = await post(url,headers: headers,body: body,);
           if(response.statusCode == 200){
-            Fluttertoast.showToast(msg: 'Punch In');
-            return true;
-
+            setState(() {
+              _punchBtnLoading = false;
+            });
           }else{
             print('Response Code : ${response.statusCode}');
           }
@@ -303,33 +254,42 @@ class _FeeScreenStates extends State<AttendanceScreen> {
     setState(() {
       _punchBtnLoading = false;
     });
-    return false;
   }
 
 
-
-
-
-
-  Future<List<Map<String,dynamic>>> _getAttendance() async {
+  Future<Map<String,dynamic>> _getAttendance() async {
     var pref = await SharedPreferences.getInstance();
     try{
       if(pref.containsKey(Consts.TOKEN)){
-        var token = pref.getString(Consts.TOKEN)??'';
-        Uri uri = Uri.parse('https://appadmin.atharvaservices.com/api/Attendance/GetAttendance');
-        var response =  await get(uri,headers: {
+        final token = pref.getString(Consts.TOKEN)??'';
+        Uri uri1 = Uri.parse('https://appadmin.atharvaservices.com/api/Attendance/GetAttendance');
+        Uri uri2 = Uri.parse('https://appadmin.atharvaservices.com/api/Attendance/GetTenantAttendanceStatus');
+        final getResponse1 =  get(uri1,headers: {
           Consts.AUTHORIZATION : 'Bearer $token',
           Consts.CONTENT_TYPE : 'application/json',
         });
-        if(response.statusCode == 200){
-          var rawBody = jsonDecode(response.body);
-          if(rawBody[Consts.STATUS] == 'Success'){
-            return List.from(rawBody['data']);
+
+        final getResponse2 =  get(uri2,headers: {
+          Consts.AUTHORIZATION : 'Bearer $token',
+          Consts.CONTENT_TYPE : 'application/json',
+        });
+
+        final response = await Future.wait([getResponse1,getResponse2]);
+
+        if(response[0].statusCode == 200 && (response[1].statusCode == 200 || response[1].statusCode != 200)){
+          final rawBody0 = jsonDecode(response[0].body);
+          final rawBody1 = jsonDecode(response[1].body);
+          if(rawBody0[Consts.STATUS] == 'Success' && (rawBody1[Consts.STATUS] == 'Success' || rawBody1[Consts.STATUS] == 'error')){
+            var result = {
+              'lastAttendance' : List.from(rawBody0['data']),
+              'lastAttendanceStatus' : rawBody1
+            };
+            return result;
           }else{
-            Future.error('${rawBody['message']}');
+            Future.error('rawBody_0 message : ${rawBody0['message']} rawBody_1 message ${rawBody1['message']}');
           }
         }else{
-          Future.error('${response.reasonPhrase}');
+          Future.error('response_0 reason: ${response[0].reasonPhrase} response_1 reason: ${response[1].reasonPhrase}');
         }
       }else{
         print('User Token Not Available');
@@ -356,6 +316,7 @@ class _FeeScreenStates extends State<AttendanceScreen> {
         headerAnimationLoop: false
     ).show();
   }
+
 }
 
 

@@ -26,95 +26,84 @@ class _HomeScreenStates extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Home',
-                style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                    fontSize: 16.fss,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w400),
-              ),
-              Row(
+    return FutureBuilder(future: init(), builder: (context,snapshot){
+      return Scaffold(
+            appBar: AppBar(
+              title: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.asset(
-                    'assets/icons/location_icon.webp',
-                    width: 20.ss,
-                    height: 20.ss,
-                    fit: BoxFit.cover,
-                  ),
-                  SizedBox(
-                    width: 5.ss,
-                  ),
                   Text(
-                    'Patna, Bihar',
+                    'Home',
                     style: Theme.of(context).textTheme.titleSmall!.copyWith(
                         fontSize: 16.fss,
                         color: Colors.black,
                         fontWeight: FontWeight.w400),
                   ),
+                  Row(
+                    children: [
+                      Image.asset(
+                        'assets/icons/location_icon.webp',
+                        width: 20.ss,
+                        height: 20.ss,
+                        fit: BoxFit.cover,
+                      ),
+                      SizedBox(
+                        width: 5.ss,
+                      ),
+                      Text(
+                        'Patna, Bihar',
+                        style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                            fontSize: 16.fss,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w400),
+                      ),
+                    ],
+                  )
                 ],
-              )
-            ],
-          ),
-          actions: [
-            Padding(
-              padding: EdgeInsets.only(right: 16.ss),
-              child: InkWell(
-                  borderRadius: BorderRadius.circular(20.ss),
-                  overlayColor:
+              ),
+              actions: [
+                Padding(
+                  padding: EdgeInsets.only(right: 16.ss),
+                  child: InkWell(
+                      borderRadius: BorderRadius.circular(20.ss),
+                      overlayColor:
                       WidgetStatePropertyAll(ColorTheme.Blue.withOpacity(0.1)),
-                  onTap: () {},
-                  child: Padding(
-                    padding: EdgeInsets.all(8.ss),
-                    child: Badge(
-                      child: Icon(Icons.notifications_none_rounded),
-                      label: Text('2'),
-                    ),
-                  )),
-            )
-          ],
-        ),
-        body: FutureBuilder(
-            future: init(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return SafeArea(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.all(16.ss),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        _CardDetails(snapshot: snapshot.data!),
-                        SizedBox(
-                          height: 15.ss,
+                      onTap: () {},
+                      child: Padding(
+                        padding: EdgeInsets.all(8.ss),
+                        child: Badge(
+                          child: Icon(Icons.notifications_none_rounded),
+                          label: Text('2'),
                         ),
-                        _PaymentCard(),
-                        _Menus()
-                      ],
-                    ),
+                      )),
+                )
+              ],
+            ),
+            body: Stack(
+              alignment: Alignment.center,
+              children:[ SafeArea(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(16.ss),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _CardDetails(snapshot: snapshot.hasData ? snapshot.data!:{}),
+                      SizedBox(
+                        height: 15.ss,
+                      ),
+                      _PaymentCard(),
+                      _Menus()
+                    ],
                   ),
-                );
-              } else if (snapshot.hasError) {
-                return Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(16.ss),
-                    child: Text(snapshot.error.toString()),
-                  ),
-                );
-              } else {
-                return const Center(
-                  child: CircularProgressIndicator(
-                    color: ColorTheme.Blue,
-                  ),
-                );
-              }
-            }));
+                ),
+              ),
+                Visibility(visible: !snapshot.hasData,child: CircularProgressIndicator(color: ColorTheme.Blue,)),
+              ]
+            ));
+
+    });
   }
 
   Future<Map<String, dynamic>> init() async {
@@ -239,14 +228,14 @@ class _CardDetails extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Hi, ${snapshot[Consts.TENANT_NAME]}',
+                      snapshot.isNotEmpty ? 'Hi, ${snapshot[Consts.TENANT_NAME]}':'N/A',
                       style: Theme.of(context)
                           .textTheme
                           .bodyMedium!
                           .copyWith(color: ColorTheme.Snow_white),
                     ),
                     Text(
-                      'Building: ${snapshot['tenantBuildingNumber']} | Room No: ${snapshot[Consts.ROOM_NO]}',
+                      snapshot.isNotEmpty ?'Building: ${snapshot['tenantBuildingNumber']} | Room No: ${snapshot[Consts.ROOM_NO]}' : 'N/A',
                       style: Theme.of(context)
                           .textTheme
                           .titleSmall!
@@ -267,7 +256,7 @@ class _CardDetails extends StatelessWidget {
                           width: 5.ss,
                         ),
                         Text(
-                          snapshot['tenantContactNumber'],
+                          snapshot.isNotEmpty ? snapshot['tenantContactNumber'] : 'N/A',
                           style: Theme.of(context)
                               .textTheme
                               .titleSmall!
@@ -290,7 +279,7 @@ class _CardDetails extends StatelessWidget {
                           width: 5.ss,
                         ),
                         Text(
-                          '${snapshot['tenantIDProofNumber']}',
+                          snapshot.isNotEmpty ?'${snapshot['tenantIDProofNumber']}' : 'N/A',
                           style: Theme.of(context)
                               .textTheme
                               .titleSmall!

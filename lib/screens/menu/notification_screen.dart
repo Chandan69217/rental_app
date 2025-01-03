@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
-
+import '../../model/consts.dart';
 import '../../utilities/color_theme.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -11,7 +15,13 @@ class NotificationScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _NotificationScreenStates();
 }
 
+
 class _NotificationScreenStates extends State<NotificationScreen> {
+
+  @override
+  void initState() {
+
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,27 +132,42 @@ class _NotificationScreenStates extends State<NotificationScreen> {
                       ),
                     ),
                     SizedBox(height: 10.ss,),
-                    Expanded(
-                      child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: 100,
-                          itemBuilder: (context, index) {
-                            return ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              onTap: (){},
-                              leading: CircleAvatar(backgroundImage: AssetImage('assets/icons/stickers/bulb.webp'),backgroundColor: ColorTheme.Pole_Blue,),
-                              title: Text('Notice for electricity',style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 16.fss,fontWeight: FontWeight.w600),overflow: TextOverflow.ellipsis,maxLines: 1,),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('from 2 Pm to 8 Pm electricity is not available because of heavy load.',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontWeight: FontWeight.w600,color: ColorTheme.Gray),overflow: TextOverflow.ellipsis,maxLines: 3,),
-                                  SizedBox(height: 5.ss,),
-                                  Text('August 06,2024 - 12:04 PM',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 8.fss,fontWeight: FontWeight.w600,color: ColorTheme.Gray),overflow: TextOverflow.ellipsis,maxLines: 3,),
-                                ],
-                              ),
-                              trailing: IconButton(onPressed: (){}, icon: Icon(Icons.more_vert)),
-                            );
-                          }),
+                    FutureBuilder(
+                      future: _getNotification(),
+                      builder:(context,snapshot){
+                        if(snapshot.hasError){
+                          return Container(padding:EdgeInsets.only(top: 20.ss),child: Text('No any notice right now',style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Gray),));
+                        }
+                        if(snapshot.hasData){
+                          if(snapshot.data!.isEmpty){
+                            return Container(padding:EdgeInsets.only(top: 20.ss),child: Text('No any notice right now',style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Gray),));
+                          }
+                          return Expanded(
+                            child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) {
+                                  return ListTile(
+                                    contentPadding: EdgeInsets.zero,
+                                    onTap: (){},
+                                    leading: CircleAvatar(backgroundImage: AssetImage('assets/icons/stickers/bulb.webp'),backgroundColor: ColorTheme.Pole_Blue,),
+                                    title: Text('${snapshot.data![index]['noticeTitle']}',style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontSize: 16.fss,fontWeight: FontWeight.w600),overflow: TextOverflow.ellipsis,maxLines: 1,),
+                                    subtitle: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('${snapshot.data![index]['noticeDescription']}',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontWeight: FontWeight.w600,color: ColorTheme.Gray),overflow: TextOverflow.ellipsis,maxLines: 3,),
+                                        SizedBox(height: 5.ss,),
+                                        Text('${snapshot.data![index]['noticeTimeStamp']}',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 8.fss,fontWeight: FontWeight.w600,color: ColorTheme.Gray),overflow: TextOverflow.ellipsis,maxLines: 3,),
+                                      ],
+                                    ),
+                                    trailing: IconButton(onPressed: (){}, icon: Icon(Icons.more_vert)),
+                                  );
+                                }),
+                          );
+                        }else{
+                          return Container(padding:EdgeInsets.only(top: 20.ss),child: const Center(child: CircularProgressIndicator(color: ColorTheme.Blue,)));
+                        }
+                      }
                     )
                   ],
                 )),
@@ -150,5 +175,36 @@ class _NotificationScreenStates extends State<NotificationScreen> {
         ],
       )),
     );
+  }
+  
+  Future<List<Map<String,dynamic>>> _getNotification() async{
+    List<Map<String,dynamic>> notices = [];
+    final pref = await SharedPreferences.getInstance();
+    final token = pref.getString(Consts.TOKEN)??'';
+
+    if(token.isNotEmpty){
+      try{
+        Uri uri = Uri.parse('https://appadmin.atharvaservices.com/api/Notice/showNotice');
+        final response = await get(uri,headers: {
+          Consts.AUTHORIZATION : 'Bearer $token',
+          Consts.CONTENT_TYPE : 'application/json'
+        });
+        if(response.statusCode == 200){
+          final rawBody = jsonDecode(response.body);
+          if(rawBody[Consts.STATUS]=='Success'){
+            return List.from(rawBody['notices']);
+          }else{
+            return Future.error('Something happened wrong !!');
+          }
+        }else{
+          return Future.error('Something happened wrong !!');
+        }
+      }catch(exception,trace){
+        print('Exception: ${exception.toString()} , Trace: ${trace.toString()}');
+      }
+    }else{
+      print('user token is not available');
+    }
+    return notices;
   }
 }

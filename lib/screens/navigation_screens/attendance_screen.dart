@@ -85,7 +85,11 @@ class _FeeScreenStates extends State<AttendanceScreen> {
                         child: hasData && snapshot.data!.isNotEmpty ? ListView.builder(
                             itemCount: lastAttendance.length,
                             shrinkWrap: true,
-                            itemBuilder: (context, index) => Padding(
+                            itemBuilder: (context, index) {
+                              var inTime = lastAttendance[index]['inTime']!=''?lastAttendance[index]['inTime']:'N/A';
+                              var outTime = lastAttendance[index]['outTime']!=''?lastAttendance[index]['outTime']:'N/A';
+                              var attendanceDate = lastAttendance[index]['attendanceDate']!=''?lastAttendance[index]['attendanceDate']:'N/A';
+                              return Padding(
                               padding: EdgeInsets.symmetric(vertical: 5.ss,horizontal: 5.ss),
                               child: Container(
                                 decoration: BoxDecoration(
@@ -111,18 +115,18 @@ class _FeeScreenStates extends State<AttendanceScreen> {
                                           child: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              Text('In : ${lastAttendance[index]['attendanceTime']}',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),),
-                                              Text('Out : N/A',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),),
+                                              Text('In : $inTime',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),),
+                                              Text('Out : $outTime',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),),
                                             ],
                                           ),
                                         ),
                                       ),
-                                      Expanded(child: Container(padding: EdgeInsets.symmetric(horizontal: 10.ss,vertical: 2.ss),alignment: Alignment.bottomRight,child: Text('N/A',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),)))
+                                      Expanded(child: Container(padding: EdgeInsets.symmetric(horizontal: 10.ss,vertical: 2.ss),alignment: Alignment.bottomRight,child: Text(attendanceDate,style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),)))
                                     ],
                                   ),
                                 ),
                               ),
-                            )
+                            );}
                         ) : Center(child: Text('No attendance available',style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Gray),),)
                       )
                   )
@@ -136,8 +140,8 @@ class _FeeScreenStates extends State<AttendanceScreen> {
   Widget _punchCard(Map<String,dynamic> value) {
     final status = value.isNotEmpty ? value[Consts.STATUS] :'error';
     final lastStatus = status == 'Success' ? value['data']['lastStatus'] : 'N/A';
-    final attendanceTimeIn = status == 'Success'? lastStatus == 'IN' ? value['data']['attendanceTime'] : 'N/A':'N/A';
-    final attendanceTimeOut = status == 'Success'? lastStatus == 'OUT' ? value['data']['attendanceTime'] : 'N/A':'N/A';
+    final attendanceTimeIn = status == 'Success'? value['data']['inTime'] !='' ? value['data']['inTime'] : 'N/A':'N/A';
+    final attendanceTimeOut = status == 'Success'? value['data']['outTime']!='' ? value['data']['outTime'] : 'N/A':'N/A';
     return Container(
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(

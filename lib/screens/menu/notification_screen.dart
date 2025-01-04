@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -181,26 +182,31 @@ class _NotificationScreenStates extends State<NotificationScreen> {
     List<Map<String,dynamic>> notices = [];
     final pref = await SharedPreferences.getInstance();
     final token = pref.getString(Consts.TOKEN)??'';
+    final connections = await Connectivity().checkConnectivity();
 
     if(token.isNotEmpty){
-      try{
-        Uri uri = Uri.parse('https://appadmin.atharvaservices.com/api/Notice/showNotice');
-        final response = await get(uri,headers: {
-          Consts.AUTHORIZATION : 'Bearer $token',
-          Consts.CONTENT_TYPE : 'application/json'
-        });
-        if(response.statusCode == 200){
-          final rawBody = jsonDecode(response.body);
-          if(rawBody[Consts.STATUS]=='Success'){
-            return List.from(rawBody['notices']);
+      if(connections.contains(ConnectivityResult.mobile)||connections.contains(ConnectivityResult.wifi)||connections.contains(ConnectivityResult.ethernet)){
+        try{
+          Uri uri = Uri.parse('https://appadmin.atharvaservices.com/api/Notice/showNotice');
+          final response = await get(uri,headers: {
+            Consts.AUTHORIZATION : 'Bearer $token',
+            Consts.CONTENT_TYPE : 'application/json'
+          });
+          if(response.statusCode == 200){
+            final rawBody = jsonDecode(response.body);
+            if(rawBody[Consts.STATUS]=='Success'){
+              return List.from(rawBody['notices']);
+            }else{
+              return Future.error('Something happened wrong !!');
+            }
           }else{
             return Future.error('Something happened wrong !!');
           }
-        }else{
-          return Future.error('Something happened wrong !!');
+        }catch(exception,trace){
+          print('Exception: ${exception.toString()} , Trace: ${trace.toString()}');
         }
-      }catch(exception,trace){
-        print('Exception: ${exception.toString()} , Trace: ${trace.toString()}');
+      }else{
+        return Future.error('No Internet Connection Available');
       }
     }else{
       print('user token is not available');

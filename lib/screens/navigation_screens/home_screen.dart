@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:rental_app/custom_paints/circular_curve.dart';
+import 'package:rental_app/screens/menu/leave_screen.dart';
 import 'package:rental_app/screens/menu/meal_screen.dart';
 import 'package:rental_app/screens/menu/notification_screen.dart';
 import 'package:rental_app/screens/navigation_screens/attendance_screen.dart';
@@ -470,7 +471,7 @@ class _Menus extends StatelessWidget{
               _MenuButton(
                 iconPath: 'assets/icons/leave.webp',
                 label: 'Leave',
-                onTap: () {},
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context)=> LeaveScreen())),
               ),
             ],
           ),

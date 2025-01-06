@@ -12,4 +12,9 @@ class ColorTheme{
   static const Color Orange_DEEP1 = Color(0xffffc955);
   static const Color TRANSPARENT_WHITE = Color(0xfff3f3f3);
   static const Color BLACK = Color(0xff000023);
+  static const Color LIGHT_GREEN = Color(0xffb6f5d2);
+  static const Color GREEN_DEEP1 = Color(0xff3d9851);
+  static const Color LIGHT_RED = Color(0xffffd1d1);
+  static const Color RED_DEEP1 = Color(0xffff8786);
+  static const Color BLUE1 = Color(0xff5a62df);
 }

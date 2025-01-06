@@ -1,6 +1,13 @@
+import 'dart:async';
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
+import 'package:intl/intl.dart';
+import 'package:rental_app/model/consts.dart';
 import 'package:rental_app/utilities/color_theme.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
 
 class LeaveScreen extends StatefulWidget{
@@ -33,7 +40,6 @@ class LeaveScreenState extends State<LeaveScreen>{
       ),
       body: DefaultTabController(
         length: 3,
-        animationDuration: Duration(milliseconds: 100,),
         initialIndex: 1,
         child: Column(
           children: [
@@ -44,103 +50,295 @@ class LeaveScreenState extends State<LeaveScreen>{
                 Tab(text: 'Sick'),
               ],indicatorColor: ColorTheme.Blue,),
             Expanded(
-              child: TabBarView(children: [
-                _ListOfLeaves(),
-                _ListOfLeaves(),
-                _ListOfLeaves(),
-              ]),
+              child: FutureBuilder(
+                future: _getLeaveData(),
+                builder: (context,snapshot){
+                  if(snapshot.hasData){
+                    return TabBarView(children: [
+                      _ListOfLeaves(data: snapshot.data,),
+                      _ListOfLeaves(data: snapshot.data,),
+                      _ListOfLeaves(data: snapshot.data,),
+                    ]);
+                  }else{
+                    return const Center(child: CircularProgressIndicator(color: ColorTheme.Blue,),);
+                  }
+                },
+              ),
             )
           ],
         )
       )
     );
   }
+
+}
+
+// Future<List<Map<String,List<Map<String,dynamic>>>>> _getLeaveData() async {
+//
+//   final uri = Uri.parse('https://appadmin.atharvaservices.com/api/Leave/showLeave');
+//   final pref = await SharedPreferences.getInstance();
+//   final token = pref.getString(Consts.TOKEN)??'';
+//
+//   if(token.isEmpty){
+//     print('user token is not available');
+//     return Future.error('user token is not available');
+//   }
+//
+//   try{
+//     var response = await get(uri,
+//       headers:{
+//         Consts.AUTHORIZATION: 'Bearer $token',
+//         Consts.CONTENT_TYPE: 'application/json'
+//       }
+//     );
+//
+//     var rawData = json.decode(response.body);
+//     if(response.statusCode == 200 && rawData[Consts.STATUS] == 'success'){
+//       return List.from((await parseRawData(rawData['data']['applications'])) as Iterable);
+//      // print('total number of result : ${parseData.length}');
+//       // for(var temp in parseData){
+//       //   print('${temp.toString()}');
+//       // }
+//       //return parseData;
+//     }
+//   }catch(exception){
+//     print('Exception: $exception');
+//   }
+//   return [];
+// }
+//
+// Future<Map<String, List<Map<String, dynamic>>>> parseRawData(List<Map<String, dynamic>> application) async {
+//   Map<String, List<Map<String, dynamic>>> parseData = {};
+//   print('total number of accepted application: ${application.length}');
+//   final DateFormat dateFormat1 = DateFormat("dd/MM/yyyy");
+//   final DateFormat dateFormat2 = DateFormat("MMMM yyyy");
+//
+//   for (var temp in application) {
+//     var dateString = temp['startDate'];
+//     try {
+//       DateTime applicationDate = dateFormat1.parse(dateString);
+//
+//       var formatDateString = dateFormat2.format(applicationDate);
+//
+//       if (parseData.containsKey(formatDateString)) {
+//         parseData[formatDateString]?.add(temp);
+//       } else {
+//         parseData[formatDateString] = [temp];
+//       }
+//     } catch (e) {
+//       print("Error parsing date: $dateString");
+//     }
+//   }
+//   return parseData;
+// }
+
+
+Future<List<Map<String, List<Map<String, dynamic>>>>> _getLeaveData() async {
+  final uri = Uri.parse('https://appadmin.atharvaservices.com/api/Leave/showLeave');
+  final pref = await SharedPreferences.getInstance();
+  final token = pref.getString(Consts.TOKEN) ?? '';
+
+  if (token.isEmpty) {
+    print('User token is not available');
+    return Future.error('User token is not available');
+  }
+
+  try {
+    var response = await get(
+      uri,
+      headers: {
+        Consts.AUTHORIZATION: 'Bearer $token',
+        Consts.CONTENT_TYPE: 'application/json'
+      },
+    );
+
+    // Check for valid response and handle errors
+    if (response.statusCode == 200) {
+      final rawData = json.decode(response.body) as Map<String,dynamic>;
+
+      if (rawData[Consts.STATUS] == 'success' && rawData['data'] != null) {
+        var applications = List<Map<String, dynamic>>.from(rawData['data']['applications']);
+        var parseData = await parseRawData(applications);
+        return parseData.entries.map((entry) {
+          return {entry.key: entry.value};
+        }).toList();
+      } else {
+        print('Error: ${rawData[Consts.STATUS]}');
+        return Future.error('Error fetching leave data');
+      }
+    } else {
+      print('HTTP error: ${response.statusCode}');
+      return Future.error('Failed to fetch data from API');
+    }
+  } catch (exception) {
+    print('Exception: $exception');
+    return Future.error('Exception occurred while fetching leave data');
+  }
+}
+
+Future<Map<String, List<Map<String, dynamic>>>> parseRawData(List<Map<String, dynamic>> applications) async {
+  Map<String, List<Map<String, dynamic>>> parseData = {};
+  print('Total number of accepted applications: ${applications.length}');
+
+  final DateFormat dateFormat1 = DateFormat("dd/MM/yyyy");
+  final DateFormat dateFormat2 = DateFormat("MMMM yyyy");
+
+  for (var temp in applications) {
+    var dateString = temp['startDate'];
+
+    try {
+      // Parse the date
+      DateTime applicationDate = dateFormat1.parse(dateString);
+
+      // Format the date to "MMMM yyyy"
+      var formatDateString = dateFormat2.format(applicationDate);
+
+      if (parseData.containsKey(formatDateString)) {
+        parseData[formatDateString]?.add(temp);
+      } else {
+        parseData[formatDateString] = [temp];
+      }
+    } catch (e) {
+      print("Error parsing date: $dateString - Exception: $e");
+    }
+  }
+
+  return parseData;
 }
 
 
-class _ListOfLeaves extends StatefulWidget{
-  @override
-  State<StatefulWidget> createState() => _ListOfLeavesState();
-}
 
-class _ListOfLeavesState extends State<_ListOfLeaves>{
+class _ListOfLeaves extends StatelessWidget{
+  List<Map<String,List<Map<String,dynamic>>>>? data = [];
+  _ListOfLeaves({this.data});
   @override
   Widget build(BuildContext context) {
+    var leaveData = data??[];
+    print('length of data : ${data!.length}');
+    return leaveData.isEmpty ? const Center(child: Text('No Data Available'),):
+        ListView.builder( itemCount: leaveData.length,
+          shrinkWrap: true,
+          itemBuilder: (BuildContext context, int index) {
+          print('${data!.length}');
+          return _leaveListTile(tileData: leaveData[index],);
+        },
+        );
+  }
+}
+
+class _leaveListTile extends StatelessWidget{
+ Map<String,List<Map<String,dynamic>>> tileData;
+ static final Map<String,List<Color>> _statusColor = {
+   'REJECTED' : [ColorTheme.LIGHT_RED,ColorTheme.RED_DEEP1],
+   'DECLINED' : [ColorTheme.LIGHT_RED,ColorTheme.RED_DEEP1],
+   'APPROVED' : [ColorTheme.LIGHT_GREEN,ColorTheme.GREEN_DEEP1],
+   'AWAITING' : [ColorTheme.Orange_LIGHT,ColorTheme.Orange_DEEP1],
+ };
+ static final Map<String,Color> _leaveTypeColor = {
+   'CASUAL' : ColorTheme.Orange_DEEP1,
+   'SICK' : ColorTheme.BLUE1,
+ };
+ _leaveListTile({required this.tileData});
+  @override
+  Widget build(BuildContext context) {
+    var data = tileData.values.expand((x)=>x).toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.only(left: 26.ss,bottom:2,top: 8.ss),
-          child: Text('December 2025',style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Gray1),),
+          padding: EdgeInsets.only(left: 26.ss,top: 8.ss),
+          child: Text(tileData.keys.first,style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Gray1),),
         ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: 5,
-            shrinkWrap: true,
-            itemBuilder: (context,index){
-              return Padding(
-                padding: EdgeInsets.symmetric(horizontal:  14.ss,vertical: 8.ss),
-                child: Container(
-                      padding: EdgeInsets.symmetric(horizontal:  12.ss,vertical: 10.ss),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(20.ss)),
-                        border: Border.all(width: 1.7.ss,color: ColorTheme.Gray1.withOpacity(0.3))
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 2,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text('Half Day Application',style: TextStyle(color: ColorTheme.Gray1),),
-                              SizedBox(height: 3.ss,),
-                              Text('Wed, 16 Dec',style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.BLACK,fontSize: 22.ss,),),
-                              SizedBox(height: 3.ss,),
-                              Text('Casual',style: TextStyle(color: ColorTheme.Orange_DEEP1),)
-                            ],
-                          )),
-                          Expanded(
-                            flex: 1,
-                              child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
+        ListView.builder(
+          itemCount: data.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context,index){
+            return
+              Padding(
+              padding: EdgeInsets.symmetric(horizontal:  14.ss,vertical: 6.ss),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal:  12.ss,vertical: 10.ss),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(20.ss)),
+                    border: Border.all(width: 1.7.ss,color: ColorTheme.Gray1.withOpacity(0.3))
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                        flex: 2,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(_countNumberOfLeaveDays(data[index]['startDate'], data[index]['endDate']),style: TextStyle(color: ColorTheme.Gray1,fontSize: 13.fss),),
+                            SizedBox(height: 3.ss,),
+                            Text(_formatDate(data[index]['startDate']),style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.BLACK,fontSize: 24.ss,),),
+                            SizedBox(height: 3.ss,),
+                            Text('${data[index]['leaveType']}',style: TextStyle(color: ColorTheme.BLUE1,fontSize: 12.fss),)
+                          ],
+                        )),
+                    Expanded(
+                        flex: 1,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
                                   shape: BoxShape.rectangle,
-                                  color: ColorTheme.Orange_LIGHT,
+                                  color: _statusColor[data[index]['status'].toString().toUpperCase()]!.first,
                                   borderRadius: BorderRadius.all(Radius.circular(8.ss))
-                                ),
-                                padding: EdgeInsets.symmetric(vertical:  8.ss,horizontal: 14.ss),
-                                child: Text('Awaiting',style: TextStyle(color: ColorTheme.Orange_DEEP),),
                               ),
-                              SizedBox(height: 10.ss,),
-                              InkWell(
-                                onTap: () {},
-                                borderRadius: BorderRadius.all(Radius.circular(8.ss)),
-                                child: Container(
-                                  padding: EdgeInsets.all(8.ss),
-                                  decoration: BoxDecoration(
+                              padding: EdgeInsets.symmetric(vertical:  8.ss,horizontal: 14.ss),
+                              child: Text('${data[index]['status']}',style: TextStyle(color: _statusColor[data[index]['status'].toString().toUpperCase()]!.last,fontSize: 13.fss),overflow: TextOverflow.ellipsis,),
+                            ),
+                            SizedBox(height: 10.ss,),
+                            InkWell(
+                              onTap: () {},
+                              borderRadius: BorderRadius.all(Radius.circular(8.ss)),
+                              child: Container(
+                                padding: EdgeInsets.all(8.ss),
+                                decoration: BoxDecoration(
                                     shape: BoxShape.rectangle,
                                     color: Colors.black12.withOpacity(0.05),
                                     borderRadius: BorderRadius.circular(8.ss)
-                                  ),
-                                  child: Icon(Icons.keyboard_arrow_right_rounded,color: ColorTheme.Gray,),
                                 ),
-                              )
-                            ],
-                          ))
-                        ],
-                      ),
+                                child: Icon(Icons.keyboard_arrow_right_rounded,color: ColorTheme.Gray,),
+                              ),
+                            )
+                          ],
+                        ))
+                  ],
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
       ],
     );
   }
+
+  String _formatDate(String dateString){
+    DateFormat format1 = DateFormat('EEE, dd MMM');
+    DateFormat format2 = DateFormat('dd/mm/yyyy');
+    DateTime givenDate = format2.parse(dateString);
+    return format1.format(givenDate);
+  }
+
+ String _countNumberOfLeaveDays(String startingDate,String endingDate){
+   DateFormat format = DateFormat('dd/mm/yyyy');
+   DateTime stating = format.parse(startingDate);
+   DateTime ending = format.parse(endingDate);
+   var day = ending.difference(stating).inDays;
+   if(day == 1){
+     return 'Full Day Application';
+   }
+   else if(day>1){
+     return '$day Days Application';
+   }else{
+     return 'Half Day Application';
+   }
+ }
 
 }

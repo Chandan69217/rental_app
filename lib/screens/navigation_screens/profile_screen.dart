@@ -110,6 +110,7 @@ class _ProfileScreenStates extends State<ProfileScreen> {
                                           pref.remove(Consts.IS_LOGIN);
                                           pref.remove(Consts.TOKEN);
                                           pref.remove(Consts.TENANT_NAME);
+                                          pref.remove('tenant_data');
                                           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> const WelcomeScreen()),(route)=>false);
                                         }
                                       },

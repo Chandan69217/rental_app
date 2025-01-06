@@ -66,78 +66,80 @@ class _ListOfLeaves extends StatefulWidget{
 class _ListOfLeavesState extends State<_ListOfLeaves>{
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: 5,
-      shrinkWrap: true,
-      itemBuilder: (context,index){
-        return Container(
-          padding: EdgeInsets.all(14.ss),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.only(left: 12.ss,bottom:2,top: 8.ss),
-                child: Text('December 2025',style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Gray1),),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal:  12.ss,vertical: 10.ss),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(20.ss)),
-                  border: Border.all(width: 1.7.ss,color: ColorTheme.Gray1)
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(left: 26.ss,bottom:2,top: 8.ss),
+          child: Text('December 2025',style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Gray1),),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: 5,
+            shrinkWrap: true,
+            itemBuilder: (context,index){
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal:  14.ss,vertical: 8.ss),
+                child: Container(
+                      padding: EdgeInsets.symmetric(horizontal:  12.ss,vertical: 10.ss),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(20.ss)),
+                        border: Border.all(width: 1.7.ss,color: ColorTheme.Gray1.withOpacity(0.3))
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 2,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text('Half Day Application',style: TextStyle(color: ColorTheme.Gray1),),
+                              SizedBox(height: 3.ss,),
+                              Text('Wed, 16 Dec',style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.BLACK,fontSize: 22.ss,),),
+                              SizedBox(height: 3.ss,),
+                              Text('Casual',style: TextStyle(color: ColorTheme.Orange_DEEP1),)
+                            ],
+                          )),
+                          Expanded(
+                            flex: 1,
+                              child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.rectangle,
+                                  color: ColorTheme.Orange_LIGHT,
+                                  borderRadius: BorderRadius.all(Radius.circular(8.ss))
+                                ),
+                                padding: EdgeInsets.symmetric(vertical:  8.ss,horizontal: 14.ss),
+                                child: Text('Awaiting',style: TextStyle(color: ColorTheme.Orange_DEEP),),
+                              ),
+                              SizedBox(height: 10.ss,),
+                              InkWell(
+                                onTap: () {},
+                                borderRadius: BorderRadius.all(Radius.circular(8.ss)),
+                                child: Container(
+                                  padding: EdgeInsets.all(8.ss),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.rectangle,
+                                    color: Colors.black12.withOpacity(0.05),
+                                    borderRadius: BorderRadius.circular(8.ss)
+                                  ),
+                                  child: Icon(Icons.keyboard_arrow_right_rounded,color: ColorTheme.Gray,),
+                                ),
+                              )
+                            ],
+                          ))
+                        ],
+                      ),
                 ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 2,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text('Half Day Application',style: TextStyle(color: ColorTheme.Gray1),),
-                        SizedBox(height: 3.ss,),
-                        Text('Wed, 16 Dec',style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.BLACK,fontSize: 22.ss,),),
-                        SizedBox(height: 3.ss,),
-                        Text('Casual',style: TextStyle(color: ColorTheme.Orange_DEEP1),)
-                      ],
-                    )),
-                    Expanded(
-                      flex: 1,
-                        child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.rectangle,
-                            color: ColorTheme.Orange_LIGHT,
-                            borderRadius: BorderRadius.all(Radius.circular(8.ss))
-                          ),
-                          padding: EdgeInsets.symmetric(vertical:  8.ss,horizontal: 14.ss),
-                          child: Text('Awaiting',style: TextStyle(color: ColorTheme.Orange_DEEP),),
-                        ),
-                        SizedBox(height: 10.ss,),
-                        InkWell(
-                          onTap: () {},
-                          borderRadius: BorderRadius.all(Radius.circular(8.ss)),
-                          child: Container(
-                            padding: EdgeInsets.all(8.ss),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.rectangle,
-                              color: Colors.black12.withOpacity(0.05),
-                              borderRadius: BorderRadius.circular(8.ss)
-                            ),
-                            child: Icon(Icons.keyboard_arrow_right_rounded,color: ColorTheme.Gray,),
-                          ),
-                        )
-                      ],
-                    ))
-                  ],
-                ),
-              )
-            ],
+              );
+            },
           ),
-        );
-      },
+        ),
+      ],
     );
   }
 

@@ -81,9 +81,7 @@ class _HomeScreenStates extends State<HomeScreen> {
                 )
               ],
             ),
-            body: Stack(
-              alignment: Alignment.center,
-              children:[ SafeArea(
+            body:  SafeArea(
                 child: SingleChildScrollView(
                   padding: EdgeInsets.all(16.ss),
                   child: Column(
@@ -100,24 +98,35 @@ class _HomeScreenStates extends State<HomeScreen> {
                   ),
                 ),
               ),
-                Visibility(visible: !snapshot.hasData,child: CircularProgressIndicator(color: ColorTheme.Blue,)),
-              ]
-            ));
+      );
 
     });
   }
 
   Future<Map<String, dynamic>> init() async {
-    List<Map<String, dynamic>> tenantData = [];
-    var uri = Uri.parse(
-        'https://appadmin.atharvaservices.com/api/Tenant/tenantProfile');
+
+    var pref = await SharedPreferences.getInstance();
+
+    var cachedData = pref.getString('tenant_data');
+    fetchDataFromNetwork(cachedData);
+    if (cachedData != null && cachedData.isNotEmpty) {
+      print('Using cached data');
+      return json.decode(cachedData); // Return the cached data
+    }
+    return Future.error('No Data Available !');
+  }
+
+  void fetchDataFromNetwork(String? cachedData) async{
+    var uri = Uri.parse('https://appadmin.atharvaservices.com/api/Tenant/tenantProfile');
     var pref = await SharedPreferences.getInstance();
     var token = pref.getString(Consts.TOKEN) ?? '';
+
     if (token.isEmpty) {
       print('Token is empty');
       return Future.error('User token is empty');
     }
     try {
+      // Fetch data from the network if not cached
       var response = await get(uri, headers: {
         Consts.AUTHORIZATION: 'Bearer $token',
         Consts.CONTENT_TYPE: 'application/json'
@@ -126,31 +135,38 @@ class _HomeScreenStates extends State<HomeScreen> {
       if (response.statusCode == 200) {
         var profileData = Map.from(json.decode(response.body)['profile']);
         print("Received data from network: $profileData");
+
         if (profileData.containsKey('tenant')) {
-          tenantData = List.from(profileData['tenant']);
-          if (tenantData[0].isNotEmpty) {
-            pref.setString(
-                Consts.TENANT_NAME, tenantData[0][Consts.TENANT_NAME]);
-            return tenantData[0];
+          var tenantData = List.from(profileData['tenant']);
+          if (tenantData.isNotEmpty) {
+            // Cache the data for future use
+            if(cachedData!=null && cachedData.isNotEmpty){
+              if(json.encode(cachedData) != json.encode(tenantData[0])){
+                pref.setString('tenant_data', json.encode(tenantData[0]));
+                setState(() {
+                });
+              }
+            }else{
+              setState(() {
+                pref.setString('tenant_data', json.encode(tenantData[0]));
+              });
+            }
+          //  return tenantData[0]; // Return the fresh data
           } else {
-            print('tenant data is not present in the response body');
-            return Future.error('tenant data is not present');
+            return Future.error('Tenant data is not present');
           }
         } else {
-          print("Tenant name is missing in the response.");
+          return Future.error("Tenant data is missing in the response.");
         }
       } else {
-        print(
-            'Data cannot be fetched with response code: ${response.statusCode} reason: ${response.reasonPhrase}');
-       Future.error(
-           'Data cannot be fetched with response code: ${response.statusCode} reason: ${response.reasonPhrase}');
+        return Future.error('Failed to fetch data with status code: ${response.statusCode}');
       }
     } catch (e) {
       print('Error occurred during network request: $e');
-     Future.error('Error occurred during network request: $e');
+      return Future.error('Error occurred during network request: $e');
     }
-    return Future.error('Data Not Present');
   }
+
 }
 
 class _MenuButton extends StatelessWidget {
@@ -193,31 +209,32 @@ class _MenuButton extends StatelessWidget {
 }
 
 class _CardDetails extends StatelessWidget {
-  Map<String, dynamic> snapshot;
-  _CardDetails({required this.snapshot});
+  final Map<String, dynamic> snapshot;
+  const _CardDetails({required this.snapshot});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      // padding: EdgeInsets.all(24.ss),
       decoration: BoxDecoration(
-          shape: BoxShape.rectangle,
-          boxShadow: [
-            BoxShadow(
-              color: ColorTheme.Gray,
-              blurRadius: 10.ss,
-              spreadRadius: 3.ss,
-            ),
-          ],
-          borderRadius: BorderRadius.circular(14.ss),
-          color: ColorTheme.Blue.withOpacity(0.95)),
+        shape: BoxShape.rectangle,
+        boxShadow: [
+          BoxShadow(
+            color: ColorTheme.Gray,
+            blurRadius: 10.ss,
+            spreadRadius: 3.ss,
+          ),
+        ],
+        borderRadius: BorderRadius.circular(14.ss),
+        color: ColorTheme.Blue.withOpacity(0.95),
+      ),
       child: CustomPaint(
         painter: CircularWave(
-            waveColor: ColorTheme.Snow_white,
-            waveHeight: 60,
-            waveLength: 550,
-            phaseShift: 1),
+          waveColor: ColorTheme.Snow_white,
+          waveHeight: 60,
+          waveLength: 550,
+          phaseShift: 1,
+        ),
         child: Padding(
           padding: EdgeInsets.all(24.ss),
           child: Row(
@@ -229,14 +246,18 @@ class _CardDetails extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      snapshot.isNotEmpty ? 'Hi, ${snapshot[Consts.TENANT_NAME]}':'N/A',
+                      snapshot.isNotEmpty
+                          ? 'Hi, ${snapshot[Consts.TENANT_NAME]}'
+                          : 'N/A',
                       style: Theme.of(context)
                           .textTheme
                           .bodyMedium!
                           .copyWith(color: ColorTheme.Snow_white),
                     ),
                     Text(
-                      snapshot.isNotEmpty ?'Building: ${snapshot['tenantBuildingNumber']} | Room No: ${snapshot[Consts.ROOM_NO]}' : 'N/A',
+                      snapshot.isNotEmpty
+                          ? 'Building: ${snapshot['tenantBuildingNumber']} | Room No: ${snapshot[Consts.ROOM_NO]}'
+                          : 'N/A',
                       style: Theme.of(context)
                           .textTheme
                           .titleSmall!
@@ -257,7 +278,9 @@ class _CardDetails extends StatelessWidget {
                           width: 5.ss,
                         ),
                         Text(
-                          snapshot.isNotEmpty ? snapshot['tenantContactNumber'] : 'N/A',
+                          snapshot.isNotEmpty
+                              ? snapshot['tenantContactNumber']
+                              : 'N/A',
                           style: Theme.of(context)
                               .textTheme
                               .titleSmall!
@@ -280,7 +303,9 @@ class _CardDetails extends StatelessWidget {
                           width: 5.ss,
                         ),
                         Text(
-                          snapshot.isNotEmpty ?'${snapshot['tenantIDProofNumber']}' : 'N/A',
+                          snapshot.isNotEmpty
+                              ? '${snapshot['tenantIDProofNumber']}'
+                              : 'N/A',
                           style: Theme.of(context)
                               .textTheme
                               .titleSmall!
@@ -292,20 +317,14 @@ class _CardDetails extends StatelessWidget {
                 ),
               ),
               ClipRRect(
-                  borderRadius: BorderRadius.circular(50.ss),
-                  child:
-                      // Image.network(
-                      //   snapshot.data!['tenantProfileImage'],
-                      //   fit: BoxFit.cover,
-                      //   width: 60.ss,
-                      //   height: 60.ss,
-                      // )
-                      Image.asset(
-                    'assets/hotels_images/profile_pic.webp',
-                    fit: BoxFit.cover,
-                    width: 60.ss,
-                    height: 60.ss,
-                  )),
+                borderRadius: BorderRadius.circular(50.ss),
+                child: Image.asset(
+                  'assets/hotels_images/profile_pic.webp',
+                  fit: BoxFit.cover,
+                  width: 60.ss,
+                  height: 60.ss,
+                ),
+              ),
             ],
           ),
         ),

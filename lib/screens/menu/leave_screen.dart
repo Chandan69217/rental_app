@@ -16,6 +16,13 @@ class LeaveScreen extends StatefulWidget{
 }
 
 class LeaveScreenState extends State<LeaveScreen>{
+  late Future<List<Map<String, List<Map<String, dynamic>>>>> _allLeaveData;
+  List<Map<String,List<Map<String,dynamic>>>> _casualLeaveData = [];
+  List<Map<String,List<Map<String,dynamic>>>> _sickLeaveData = [];
+  @override
+  void initState() {
+    _allLeaveData = _getLeaveData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,13 +58,13 @@ class LeaveScreenState extends State<LeaveScreen>{
               ],indicatorColor: ColorTheme.Blue,),
             Expanded(
               child: FutureBuilder(
-                future: _getLeaveData(),
+                future: _allLeaveData,
                 builder: (context,snapshot){
                   if(snapshot.hasData){
                     return TabBarView(children: [
                       _ListOfLeaves(data: snapshot.data,),
-                      _ListOfLeaves(data: snapshot.data,),
-                      _ListOfLeaves(data: snapshot.data,),
+                      _ListOfLeaves(data: _casualLeaveData,),
+                      _ListOfLeaves(data: _sickLeaveData,),
                     ]);
                   }else{
                     return const Center(child: CircularProgressIndicator(color: ColorTheme.Blue,),);
@@ -69,6 +76,96 @@ class LeaveScreenState extends State<LeaveScreen>{
         )
       )
     );
+  }
+
+  Future<bool> _categorizeList(List<Map<String, List<Map<String, dynamic>>>> allLeaves) async{
+    for(var group in allLeaves){
+      for(var value in group.values){
+        for(var map in value){
+          if(map['leaveType']=='Sick'){
+            _sickLeaveData.add({group.keys.first : [map]});
+          }else{
+            _casualLeaveData.add({group.keys.first:[map]});
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  Future<List<Map<String, List<Map<String, dynamic>>>>> _getLeaveData() async {
+    final uri = Uri.parse('https://appadmin.atharvaservices.com/api/Leave/showLeave');
+    final pref = await SharedPreferences.getInstance();
+    final token = pref.getString(Consts.TOKEN) ?? '';
+
+    if (token.isEmpty) {
+      print('User token is not available');
+      return Future.error('User token is not available');
+    }
+
+    try {
+      var response = await get(
+        uri,
+        headers: {
+          Consts.AUTHORIZATION: 'Bearer $token',
+          Consts.CONTENT_TYPE: 'application/json'
+        },
+      );
+
+      // Check for valid response and handle errors
+      if (response.statusCode == 200) {
+        final rawData = json.decode(response.body) as Map<String,dynamic>;
+        if (rawData[Consts.STATUS] == 'success' && rawData['data'] != null) {
+          var applications = List<Map<String, dynamic>>.from(rawData['data']['applications']);
+          var groupData = await groupRawData(applications);
+          var listOfGroups = groupData.entries.map((entry) {
+            return {entry.key: entry.value};
+          }).toList();
+          await _categorizeList(listOfGroups);
+          return listOfGroups;
+        } else {
+          print('Error: ${rawData[Consts.STATUS]}');
+          return Future.error('Error fetching leave data');
+        }
+      } else {
+        print('HTTP error: ${response.statusCode}');
+        return Future.error('Failed to fetch data from API');
+      }
+    } catch (exception) {
+      print('Exception: $exception');
+      return Future.error('Exception occurred while fetching leave data');
+    }
+  }
+
+  Future<Map<String, List<Map<String, dynamic>>>> groupRawData(List<Map<String, dynamic>> applications) async {
+    Map<String, List<Map<String, dynamic>>> parseData = {};
+    print('Total number of accepted applications: ${applications.length}');
+
+    final DateFormat dateFormat1 = DateFormat("dd/MM/yyyy");
+    final DateFormat dateFormat2 = DateFormat("MMMM yyyy");
+
+    for (var temp in applications) {
+      var dateString = temp['startDate'];
+
+      if (dateString == null || dateString.isEmpty) {
+        print('Missing startDate for application: $temp');
+        continue;
+      }
+
+      try {
+        DateTime applicationDate = dateFormat1.parse(dateString);
+        var formatDateString = dateFormat2.format(applicationDate);
+        if (parseData.containsKey(formatDateString)) {
+          parseData[formatDateString]?.add(temp);
+        } else {
+          parseData[formatDateString] = [temp];
+        }
+      } catch (e) {
+        print("Error parsing date: $dateString - Exception: $e");
+      }
+    }
+
+    return parseData;
   }
 
 }
@@ -133,78 +230,7 @@ class LeaveScreenState extends State<LeaveScreen>{
 // }
 
 
-Future<List<Map<String, List<Map<String, dynamic>>>>> _getLeaveData() async {
-  final uri = Uri.parse('https://appadmin.atharvaservices.com/api/Leave/showLeave');
-  final pref = await SharedPreferences.getInstance();
-  final token = pref.getString(Consts.TOKEN) ?? '';
 
-  if (token.isEmpty) {
-    print('User token is not available');
-    return Future.error('User token is not available');
-  }
-
-  try {
-    var response = await get(
-      uri,
-      headers: {
-        Consts.AUTHORIZATION: 'Bearer $token',
-        Consts.CONTENT_TYPE: 'application/json'
-      },
-    );
-
-    // Check for valid response and handle errors
-    if (response.statusCode == 200) {
-      final rawData = json.decode(response.body) as Map<String,dynamic>;
-
-      if (rawData[Consts.STATUS] == 'success' && rawData['data'] != null) {
-        var applications = List<Map<String, dynamic>>.from(rawData['data']['applications']);
-        var parseData = await parseRawData(applications);
-        return parseData.entries.map((entry) {
-          return {entry.key: entry.value};
-        }).toList();
-      } else {
-        print('Error: ${rawData[Consts.STATUS]}');
-        return Future.error('Error fetching leave data');
-      }
-    } else {
-      print('HTTP error: ${response.statusCode}');
-      return Future.error('Failed to fetch data from API');
-    }
-  } catch (exception) {
-    print('Exception: $exception');
-    return Future.error('Exception occurred while fetching leave data');
-  }
-}
-
-Future<Map<String, List<Map<String, dynamic>>>> parseRawData(List<Map<String, dynamic>> applications) async {
-  Map<String, List<Map<String, dynamic>>> parseData = {};
-  print('Total number of accepted applications: ${applications.length}');
-
-  final DateFormat dateFormat1 = DateFormat("dd/MM/yyyy");
-  final DateFormat dateFormat2 = DateFormat("MMMM yyyy");
-
-  for (var temp in applications) {
-    var dateString = temp['startDate'];
-
-    try {
-      // Parse the date
-      DateTime applicationDate = dateFormat1.parse(dateString);
-
-      // Format the date to "MMMM yyyy"
-      var formatDateString = dateFormat2.format(applicationDate);
-
-      if (parseData.containsKey(formatDateString)) {
-        parseData[formatDateString]?.add(temp);
-      } else {
-        parseData[formatDateString] = [temp];
-      }
-    } catch (e) {
-      print("Error parsing date: $dateString - Exception: $e");
-    }
-  }
-
-  return parseData;
-}
 
 
 
@@ -327,7 +353,7 @@ class _leaveListTile extends StatelessWidget{
   }
 
  String _countNumberOfLeaveDays(String startingDate,String endingDate){
-   DateFormat format = DateFormat('dd/mm/yyyy');
+   DateFormat format = DateFormat('dd/MM/yyyy');
    DateTime stating = format.parse(startingDate);
    DateTime ending = format.parse(endingDate);
    var day = ending.difference(stating).inDays;

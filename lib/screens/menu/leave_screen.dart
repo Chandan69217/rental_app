@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:rental_app/model/consts.dart';
+import 'package:rental_app/screens/menu/new_leave_Screen.dart';
 import 'package:rental_app/utilities/color_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
@@ -41,7 +42,7 @@ class LeaveScreenState extends State<LeaveScreen>{
                   child: Icon(Icons.notifications_none_rounded),
                 ),
               )),
-          IconButton(onPressed: (){}, icon: const Icon(Icons.add))
+          IconButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context)=> NewLeaveScreen())), icon: const Icon(Icons.add))
         ],
         foregroundColor: ColorTheme.Snow_white,
       ),
@@ -170,70 +171,6 @@ class LeaveScreenState extends State<LeaveScreen>{
 
 }
 
-// Future<List<Map<String,List<Map<String,dynamic>>>>> _getLeaveData() async {
-//
-//   final uri = Uri.parse('https://appadmin.atharvaservices.com/api/Leave/showLeave');
-//   final pref = await SharedPreferences.getInstance();
-//   final token = pref.getString(Consts.TOKEN)??'';
-//
-//   if(token.isEmpty){
-//     print('user token is not available');
-//     return Future.error('user token is not available');
-//   }
-//
-//   try{
-//     var response = await get(uri,
-//       headers:{
-//         Consts.AUTHORIZATION: 'Bearer $token',
-//         Consts.CONTENT_TYPE: 'application/json'
-//       }
-//     );
-//
-//     var rawData = json.decode(response.body);
-//     if(response.statusCode == 200 && rawData[Consts.STATUS] == 'success'){
-//       return List.from((await parseRawData(rawData['data']['applications'])) as Iterable);
-//      // print('total number of result : ${parseData.length}');
-//       // for(var temp in parseData){
-//       //   print('${temp.toString()}');
-//       // }
-//       //return parseData;
-//     }
-//   }catch(exception){
-//     print('Exception: $exception');
-//   }
-//   return [];
-// }
-//
-// Future<Map<String, List<Map<String, dynamic>>>> parseRawData(List<Map<String, dynamic>> application) async {
-//   Map<String, List<Map<String, dynamic>>> parseData = {};
-//   print('total number of accepted application: ${application.length}');
-//   final DateFormat dateFormat1 = DateFormat("dd/MM/yyyy");
-//   final DateFormat dateFormat2 = DateFormat("MMMM yyyy");
-//
-//   for (var temp in application) {
-//     var dateString = temp['startDate'];
-//     try {
-//       DateTime applicationDate = dateFormat1.parse(dateString);
-//
-//       var formatDateString = dateFormat2.format(applicationDate);
-//
-//       if (parseData.containsKey(formatDateString)) {
-//         parseData[formatDateString]?.add(temp);
-//       } else {
-//         parseData[formatDateString] = [temp];
-//       }
-//     } catch (e) {
-//       print("Error parsing date: $dateString");
-//     }
-//   }
-//   return parseData;
-// }
-
-
-
-
-
-
 class _ListOfLeaves extends StatelessWidget{
   List<Map<String,List<Map<String,dynamic>>>>? data = [];
   _ListOfLeaves({this.data});
@@ -301,7 +238,7 @@ class _leaveListTile extends StatelessWidget{
                             SizedBox(height: 3.ss,),
                             Text(_formatDate(data[index]['startDate']),style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.BLACK,fontSize: 24.ss,),),
                             SizedBox(height: 3.ss,),
-                            Text('${data[index]['leaveType']}',style: TextStyle(color: ColorTheme.BLUE1,fontSize: 12.fss),)
+                            Text('${data[index]['leaveType']}',style: TextStyle(color: _leaveTypeColor[data[index]['leaveType'].toString().toUpperCase()],fontSize: 12.fss),)
                           ],
                         )),
                     Expanded(

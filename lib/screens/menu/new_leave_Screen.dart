@@ -15,6 +15,8 @@ import '../../model/consts.dart';
 import '../../utilities/color_theme.dart';
 
 class NewLeaveScreen extends StatefulWidget {
+  VoidCallback? refresh;
+  NewLeaveScreen({this.refresh});
   @override
   State<StatefulWidget> createState() => _NewLeaveScreenState();
 }
@@ -61,32 +63,46 @@ class _NewLeaveScreenState extends State<NewLeaveScreen> {
                       children: [
                         const Text('Leave Type'),
                         SizedBox(height: 5.ss,),
-                        Container(
-                          padding: EdgeInsets.all(10.ss),
-                          decoration: BoxDecoration(
-                            //color: ColorTheme.TRANSPARENT_WHITE,
-                              borderRadius: BorderRadius.all(Radius.circular(10.ss)),
-                              border: Border.all(width: 1)
-                            //boxShadow: [BoxShadow(color: ColorTheme.Gray1,blurRadius: 8.ss,spreadRadius: 0.ss)]
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CustomDropdown<String>(
-                                items: ['Sick', 'Casual'],
-                                onChanged: (pickedType) {
-                                  if(pickedType !=null){
-                                    if(_leaveData.containsKey('leaveType')){
-                                      _leaveData.update('leaveType', (_)=>pickedType);
-                                    }else{
-                                      _leaveData.putIfAbsent('leaveType', ()=>pickedType);
-                                    }
-                                  }
-                                },
-                                hintText: 'select leave type',
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(),
+                                borderRadius: BorderRadius.circular(4.ss),
                               ),
-                            ],
-                          ),
+                              padding: EdgeInsets.symmetric(horizontal:8.ss),
+                              child: DropdownMenu<String>(
+                                hintText: 'select leave type',
+                                 inputDecorationTheme:  InputDecorationTheme(
+                                   border: InputBorder.none,
+
+                                 ),
+                                 width: MediaQuery.of(context).size.width,
+                                  menuStyle:  MenuStyle(
+                                   padding: WidgetStatePropertyAll(EdgeInsets.all(8.ss)), // Padding for items in the menu
+                                    shape: WidgetStatePropertyAll(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8.ss),
+                                      ),
+                                    ),
+                                    elevation: WidgetStatePropertyAll(4.ss), // Optional: set elevation (shadow)
+                                  ),
+                                  onSelected: (selectedType){
+                                    if(selectedType !=null){
+                                      if(_leaveData.containsKey('leaveType')){
+                                        _leaveData.update('leaveType', (_)=>selectedType);
+                                      }else{
+                                        _leaveData.putIfAbsent('leaveType', ()=>selectedType);
+                                      }
+                                    }
+                                  },
+                                  dropdownMenuEntries: [
+                                DropdownMenuEntry(value: 'Sick', label: 'Sick'),
+                                DropdownMenuEntry(value: 'Casual', label: 'Casual'),
+                              ]),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -100,145 +116,112 @@ class _NewLeaveScreenState extends State<NewLeaveScreen> {
                       children: [
                         const Text('Leave Date'),
                         SizedBox(height: 5.ss,),
-                        Container(
-                          padding: EdgeInsets.all(10.ss),
-                          decoration: BoxDecoration(
-                            //color: ColorTheme.TRANSPARENT_WHITE,
-                              borderRadius: BorderRadius.all(Radius.circular(10.ss)),
-                              border: Border.all(width: 1)
-                            //boxShadow: [BoxShadow(color: ColorTheme.Gray1,blurRadius: 8.ss,spreadRadius: 0.ss)]
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    const Text(
-                                      'Start Date',
-                                      style: TextStyle(color: ColorTheme.GREEN_DEEP1),
-                                    ),
-                                    SizedBox(
-                                      height: 4.ss,
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        showDatePicker(
-                                            context: context,
-                                            initialEntryMode: DatePickerEntryMode.calendarOnly,
-                                            selectableDayPredicate: (selectedDate){
-                                              return true;
-                                            },
-                                            firstDate: _startDate,
-                                            lastDate: _lastDate,
-                                        ).then((pickedDate){
-                                          if(pickedDate !=null){
-                                            setState(() {
-                                              _startDateEnding = pickedDate.add(Duration(days: 1));
-                                              if(_leaveData.containsKey('startDate')){
-                                                _leaveData.update('startDate', (_)=>_dateFormat.format(pickedDate));
-                                                _leaveData.remove('endDate');
-                                              }else{
-                                                _leaveData.putIfAbsent('startDate', ()=>_dateFormat.format(pickedDate));
-                                                
-                                              }
-                                            });
-                                          }
-                                        });
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.all(8.ss),
-                                        decoration: BoxDecoration(
-                                          color: ColorTheme.LIGHT_GREEN,
-                                          borderRadius: BorderRadius.circular(8.ss),
-                                          // boxShadow: [BoxShadow(color: ColorTheme.Gray,blurRadius: 4.ss)]
-                                        ),
-                                        child:  Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Expanded(
-                                                child: Text(
-                                                   _leaveData.containsKey('startDate') ? _leaveData['startDate']! :'choose date',
-                                                  textAlign: TextAlign.center,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                      color: ColorTheme.GREEN_DEEP1),
-                                                )),
-                                            Icon(
-                                              Icons.calendar_month_outlined,
-                                              color: ColorTheme.GREEN_DEEP1,
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    )
-                                  ],
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+                                  showDatePicker(
+                                    context: context,
+                                    initialEntryMode: DatePickerEntryMode.calendarOnly,
+                                    selectableDayPredicate: (selectedDate){
+                                      return true;
+                                    },
+                                    firstDate: _startDate,
+                                    lastDate: _lastDate,
+                                  ).then((pickedDate){
+                                    if(pickedDate !=null){
+                                      setState(() {
+                                        _startDateEnding = pickedDate.add(Duration(days: 1));
+                                        if(_leaveData.containsKey('startDate')){
+                                          _leaveData.update('startDate', (_)=>_dateFormat.format(pickedDate));
+                                          _leaveData.remove('endDate');
+                                        }else{
+                                          _leaveData.putIfAbsent('startDate', ()=>_dateFormat.format(pickedDate));
+
+                                        }
+                                      });
+                                    }
+                                  });
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.all(8.ss),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(),
+                                    borderRadius: BorderRadius.circular(8.ss),
+                                    // boxShadow: [BoxShadow(color: ColorTheme.Gray,blurRadius: 4.ss)]
+                                  ),
+                                  child:  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                          child: Text(
+                                            _leaveData.containsKey('startDate') ? _leaveData['startDate']! :'start date',
+                                            textAlign: TextAlign.center,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.normal),
+                                          )),
+                                      Icon(
+                                        Icons.calendar_month_outlined,
+                                      )
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              SizedBox(
-                                width: 20.ss,
-                              ),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    const Text(
-                                      'End Date',
-                                      style: TextStyle(color: ColorTheme.RED_DEEP1),
-                                    ),
-                                    SizedBox(
-                                      height: 4.ss,
-                                    ),
-                                    GestureDetector(
-                                      onTap: _leaveData.containsKey('startDate')?() {
-                                        showDatePicker(
-                                          context: context,
-                                          initialEntryMode: DatePickerEntryMode.calendarOnly,
-                                          barrierLabel: 'Select start date',
-                                          currentDate: DateTime.now(),
-                                          firstDate: _startDateEnding,
-                                          lastDate: _lastDate,
-                                        ).then((pickedDate){
-                                          if(pickedDate !=null){
-                                            setState(() {
-                                              _leaveData.putIfAbsent('endDate', ()=>_dateFormat.format(pickedDate));
-                                            });
-                                          }
-                                        });
-                                      }:()=> Fluttertoast.showToast(msg: 'first select starting date then ending'),
-                                      child: Container(
-                                        padding: EdgeInsets.all(8.ss),
-                                        decoration: BoxDecoration(
-                                            color: ColorTheme.LIGHT_RED,
-                                            // boxShadow: [BoxShadow(color: ColorTheme.Gray,blurRadius: 4.ss)],
-                                            borderRadius:
-                                            BorderRadius.circular(8.ss)),
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: [
-                                            Expanded(
-                                                child: Text(
-                                                  _leaveData.containsKey('endDate')?_leaveData['endDate']!:'choose date',
-                                                  textAlign: TextAlign.center,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                      color: ColorTheme.RED_DEEP1),
-                                                )),
-                                            Icon(
-                                              Icons.calendar_month_outlined,
-                                              color: ColorTheme.RED_DEEP1,
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    )
-                                  ],
+                              )
+                            ),
+                            SizedBox(
+                              width: 20.ss,
+                            ),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: _leaveData.containsKey('startDate')?() {
+                                  showDatePicker(
+                                    context: context,
+                                    initialEntryMode: DatePickerEntryMode.calendarOnly,
+                                    currentDate: DateTime.now(),
+                                    firstDate: _startDateEnding,
+                                    lastDate: _lastDate,
+                                  ).then((pickedDate){
+                                    if(pickedDate !=null){
+                                      setState(() {
+                                        _leaveData.putIfAbsent('endDate', ()=>_dateFormat.format(pickedDate));
+                                      });
+                                    }
+                                  });
+                                }:()=> Fluttertoast.showToast(msg: 'first select starting date then ending'),
+                                child: Container(
+                                  padding: EdgeInsets.all(8.ss),
+                                  decoration: BoxDecoration(
+                                    // color: ColorTheme.LIGHT_RED,
+                                    // boxShadow: [BoxShadow(color: ColorTheme.Gray,blurRadius: 4.ss)],
+                                    borderRadius:
+                                    BorderRadius.circular(8.ss),
+                                    border: Border.all(),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                          child: Text(
+                                            _leaveData.containsKey('endDate')?_leaveData['endDate']!:'end date',
+                                            textAlign: TextAlign.center,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.normal),
+                                          )),
+                                      Icon(
+                                        Icons.calendar_month_outlined,
+                                        // color: ColorTheme.RED_DEEP1,
+                                      )
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
+                              )
+                            ),
+                          ],
                         ),
                       ],
                     ),),
@@ -261,9 +244,9 @@ class _NewLeaveScreenState extends State<NewLeaveScreen> {
                         decoration: InputDecoration(
                             hintText: "Type cause....",
                             enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10)),
+                                borderRadius: BorderRadius.circular(4.ss)),
                             focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10)),
+                                borderRadius: BorderRadius.circular(4.ss)),
                             border: InputBorder.none,
                             hintStyle: TextStyle(fontSize: 14.fss,color: ColorTheme.Gray1)),
                       ),
@@ -341,6 +324,7 @@ class _NewLeaveScreenState extends State<NewLeaveScreen> {
         if(response.statusCode == 200){
           final rawData = json.decode(response.body);
           if(rawData['status']){
+            widget.refresh;
             AwesomeDialog(context: context,
               dialogType: DialogType.success,
               animType: AnimType.bottomSlide,

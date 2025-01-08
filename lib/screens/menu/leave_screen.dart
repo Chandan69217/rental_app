@@ -25,6 +25,9 @@ class LeaveScreenState extends State<LeaveScreen>{
     _allLeaveData = _getLeaveData();
   }
 
+  _refresh(){
+    setState((){});
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,7 +45,7 @@ class LeaveScreenState extends State<LeaveScreen>{
                   child: Icon(Icons.notifications_none_rounded),
                 ),
               )),
-          IconButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context)=> NewLeaveScreen())), icon: const Icon(Icons.add))
+          IconButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context)=> NewLeaveScreen(refresh: _refresh,))), icon: const Icon(Icons.add))
         ],
         foregroundColor: ColorTheme.Snow_white,
       ),
@@ -142,7 +145,7 @@ class LeaveScreenState extends State<LeaveScreen>{
     Map<String, List<Map<String, dynamic>>> parseData = {};
     print('Total number of accepted applications: ${applications.length}');
 
-    final DateFormat dateFormat1 = DateFormat("dd/MM/yyyy");
+    final DateFormat dateFormat1 = DateFormat("dd-MMM-yyyy");
     final DateFormat dateFormat2 = DateFormat("MMMM yyyy");
 
     for (var temp in applications) {
@@ -284,13 +287,13 @@ class _leaveListTile extends StatelessWidget{
 
   String _formatDate(String dateString){
     DateFormat format1 = DateFormat('EEE, dd MMM');
-    DateFormat format2 = DateFormat('dd/mm/yyyy');
+    DateFormat format2 = DateFormat('dd-MMM-yyyy');
     DateTime givenDate = format2.parse(dateString);
     return format1.format(givenDate);
   }
 
  String _countNumberOfLeaveDays(String startingDate,String endingDate){
-   DateFormat format = DateFormat('dd/MM/yyyy');
+   DateFormat format = DateFormat('dd-MMM-yyyy');
    DateTime stating = format.parse(startingDate);
    DateTime ending = format.parse(endingDate);
    var day = ending.difference(stating).inDays;

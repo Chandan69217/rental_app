@@ -72,7 +72,7 @@ class _ProfileScreenStates extends State<ProfileScreen> {
                                 padding: EdgeInsets.only(top: 30.ss, bottom: 2.ss),
                                 child: CircleAvatar(
                                   backgroundImage: const AssetImage(
-                                      'assets/hotels_images/profile_pic.webp'),
+                                      'assets/icons/profile_pic.webp'),
                                   radius: 60.ss,
                                 ),
                               ),

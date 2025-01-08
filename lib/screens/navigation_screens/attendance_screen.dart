@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -212,6 +213,11 @@ class _FeeScreenStates extends State<AttendanceScreen> {
   }
 
   Future<void> _markAttendance(bool value) async{
+    final connectionResult = await Connectivity().checkConnectivity();
+    if(!(connectionResult.contains(ConnectivityResult.mobile)||connectionResult.contains(ConnectivityResult.wifi)||connectionResult.contains(ConnectivityResult.ethernet))){
+      Fluttertoast.showToast(msg: 'No internet connection available');
+      return;
+    }
     setState(() {
       _punchBtnLoading = true;
     });
@@ -238,10 +244,25 @@ class _FeeScreenStates extends State<AttendanceScreen> {
               'https://appadmin.atharvaservices.com/api/Attendance/tenantAttendance');
           final response = await post(url,headers: headers,body: body,);
           if(response.statusCode == 200){
+            AwesomeDialog(context: context,
+              dialogType: DialogType.success,
+              animType: AnimType.bottomSlide,
+              title: '${value ? "Punch in" : "Punch out"} marked successful',
+              btnOkOnPress: (){}
+            ).show();
             setState(() {
               _punchBtnLoading = false;
             });
           }else{
+            AwesomeDialog(context: context,
+                dialogType: DialogType.error,
+                animType: AnimType.bottomSlide,
+                title: 'unable to mark your attendance',
+                btnOkOnPress: (){}
+            ).show();
+            setState(() {
+              _punchBtnLoading = false;
+            });
             print('Response Code : ${response.statusCode}');
           }
         }catch(exception){

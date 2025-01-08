@@ -319,7 +319,7 @@ class _CardDetails extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(50.ss),
                 child: Image.asset(
-                  'assets/hotels_images/profile_pic.webp',
+                  'assets/icons/profile_pic.webp',
                   fit: BoxFit.cover,
                   width: 60.ss,
                   height: 60.ss,

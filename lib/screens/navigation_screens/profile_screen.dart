@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rental_app/model/consts.dart';
 import 'package:rental_app/screens/authentication/welcome_screen.dart';
+import 'package:rental_app/screens/navigation_screens/fee_screen.dart';
+import 'package:rental_app/widgets/cust_circular_progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
 
@@ -38,33 +40,32 @@ class _ProfileScreenStates extends State<ProfileScreen> {
         centerTitle: true,
         backgroundColor: ColorTheme.Blue,
       ),
-      body: FutureBuilder(future: init(), builder: (content,snapshot){
-        if(snapshot.hasData){
-          return SafeArea(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Expanded(flex:1,child: SizedBox()),
-                  Expanded(
-                    flex: 14,
-                    child: Container(
-                      constraints: BoxConstraints(
-                          minWidth: MediaQuery.of(context).size.width,
-                          minHeight: MediaQuery.of(context).size.height * 0.8
-                      ),
-                      decoration: BoxDecoration(
-                          color: ColorTheme.Ghost_White,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black12,
-                              offset: Offset(0, -14.ss),
-                              blurRadius: 12.ss,)
-                          ],
-                          borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(35.ss),
-                              topRight: Radius.circular(35.ss))),
-                      child:
-                      Column(
+      body: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              const Expanded(flex:1,child: SizedBox()),
+              Expanded(
+                flex: 14,
+                child: Container(
+                  constraints: BoxConstraints(
+                      minWidth: MediaQuery.of(context).size.width,
+                      minHeight: MediaQuery.of(context).size.height * 0.8
+                  ),
+                  decoration: BoxDecoration(
+                      color: ColorTheme.Ghost_White,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          offset: Offset(0, -14.ss),
+                          blurRadius: 12.ss,)
+                      ],
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(35.ss),
+                          topRight: Radius.circular(35.ss))),
+                  child: FutureBuilder(future: init(), builder: (context,snapshot){
+                    if(snapshot.hasData){
+                      return Column(
                         children: [
                           Column(
                             children: [
@@ -100,7 +101,7 @@ class _ProfileScreenStates extends State<ProfileScreen> {
                                     _profileButtons(iconPath: 'assets/icons/payments.webp', label: 'Payments',onTap: (){},),
                                     Padding(padding: EdgeInsets.symmetric(vertical: 8.ss),
                                         child: Text('Settings',style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Blue,fontWeight: FontWeight.w600),)),
-                                    _profileButtons(iconPath: 'assets/icons/notification-bell.webp', label: 'Notifications',onTap: (){},),
+                                    _profileButtons(iconPath: 'assets/icons/notification-bell.webp', label: 'Notifications',onTap: (){Navigator.of(context).push(MaterialPageRoute(builder: (context)=> FeeScreen(enableBack: true,)));},),
                                     _profileButtons(iconPath: 'assets/icons/terms-and-conditions.webp', label: 'Terms & Conditions',onTap: (){},),
                                     _profileButtons(iconPath: 'assets/icons/privacy-policy.webp', label: 'Privacy Police',onTap: (){},),
                                     ListTile(
@@ -123,15 +124,22 @@ class _ProfileScreenStates extends State<ProfileScreen> {
                             ),
                           )
                         ],
-                      ),
-                    ),
-                  ),
-                ],
-              ));
-        }else{
-          return Center(child: CircularProgressIndicator(color: ColorTheme.Blue,),);
-        }
-      })
+                      );
+                    }else{
+                      return Center(child: CustCircularProgress(color: ColorTheme.Blue,),);
+                    }
+                  })
+                ),
+              ),
+            ],
+          ))
+      // FutureBuilder(future: init(), builder: (content,snapshot){
+      //   if(snapshot.hasData){
+      //     return
+      //   }else{
+      //
+      //   }
+      // })
     );
   }
 }

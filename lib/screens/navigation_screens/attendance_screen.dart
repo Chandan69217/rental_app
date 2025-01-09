@@ -12,6 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:rental_app/custom_paints/rect_painter.dart';
 import 'package:rental_app/model/consts.dart';
 import 'package:rental_app/utilities/permission_handler.dart';
+import 'package:rental_app/widgets/cust_circular_progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
 import '../../custom_paints/circular_curve.dart';
@@ -22,10 +23,10 @@ class AttendanceScreen extends StatefulWidget {
   final VoidCallback? onBackPressed;
   AttendanceScreen({this.enableBack = false, this.onBackPressed});
   @override
-  State<StatefulWidget> createState() => _FeeScreenStates();
+  State<StatefulWidget> createState() => _AttendanceScreenStates();
 }
 
-class _FeeScreenStates extends State<AttendanceScreen> {
+class _AttendanceScreenStates extends State<AttendanceScreen> {
   bool _punchBtnLoading = false;
   String _token = 'N/A';
   LocationPermissionStatus permissionStatus = LocationPermissionStatus.denied;
@@ -45,6 +46,7 @@ class _FeeScreenStates extends State<AttendanceScreen> {
     var pref = await SharedPreferences.getInstance();
     _token = pref.getString(Consts.TOKEN) ?? '';
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,70 +72,74 @@ class _FeeScreenStates extends State<AttendanceScreen> {
       body: FutureBuilder(future: _getAttendance(), builder: (context,snapshot){
         bool hasData = snapshot.hasData ? true : snapshot.hasError ? false : false;
         final lastAttendance = hasData? snapshot.data!['lastAttendance'] : [];
-        return SafeArea(
-            child: Padding(
-              padding: EdgeInsets.all(16.ss),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _punchCard(hasData ? snapshot.data!['lastAttendanceStatus']:{}),
-                  SizedBox(height: 10.ss,),
-                  const Text('Last Attendance',textAlign: TextAlign.start,),
-                  Expanded(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical:  12.ss),
-                        child: hasData && snapshot.data!.isNotEmpty ? ListView.builder(
-                            itemCount: lastAttendance.length,
-                            shrinkWrap: true,
-                            itemBuilder: (context, index) {
-                              var inTime = lastAttendance[index]['inTime']!=''?lastAttendance[index]['inTime']:'N/A';
-                              var outTime = lastAttendance[index]['outTime']!=''?lastAttendance[index]['outTime']:'N/A';
-                              var attendanceDate = lastAttendance[index]['attendanceDate']!=''?lastAttendance[index]['attendanceDate']:'N/A';
-                              return Padding(
-                              padding: EdgeInsets.symmetric(vertical: 5.ss,horizontal: 5.ss),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10.ss),
-                                    color: ColorTheme.Ghost_White,
-                                    boxShadow: [
-                                      BoxShadow(
-                                          color: Colors.black12,
-                                          blurRadius: 5.ss,
-                                          blurStyle: BlurStyle.outer
-                                      )
-                                    ]
-                                ),
-                                child: CustomPaint(
-                                  painter: RectPainter(),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Expanded(
-                                        child: Padding(
-                                          padding: EdgeInsets.all(15.ss),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text('In : $inTime',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),),
-                                              Text('Out : $outTime',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),),
-                                            ],
-                                          ),
+        if(snapshot.hasError){
+            return Center(child: Text(snapshot.error.toString(),style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Gray1),),);
+        }else{
+          return SafeArea(
+              child: Padding(
+                padding: EdgeInsets.all(16.ss),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _punchCard(hasData ? snapshot.data!['lastAttendanceStatus']:{}),
+                    SizedBox(height: 10.ss,),
+                    const Text('Last Attendance',textAlign: TextAlign.start,),
+                    Expanded(
+                        child: Container(
+                            padding: EdgeInsets.symmetric(vertical:  12.ss),
+                            child: hasData && snapshot.data!.isNotEmpty ? ListView.builder(
+                                itemCount: lastAttendance.length,
+                                shrinkWrap: true,
+                                itemBuilder: (context, index) {
+                                  var inTime = lastAttendance[index]['inTime']!=''?lastAttendance[index]['inTime']:'N/A';
+                                  var outTime = lastAttendance[index]['outTime']!=''?lastAttendance[index]['outTime']:'N/A';
+                                  var attendanceDate = lastAttendance[index]['attendanceDate']!=''?lastAttendance[index]['attendanceDate']:'N/A';
+                                  return Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 5.ss,horizontal: 5.ss),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(10.ss),
+                                          color: ColorTheme.Ghost_White,
+                                          boxShadow: [
+                                            BoxShadow(
+                                                color: Colors.black12,
+                                                blurRadius: 5.ss,
+                                                blurStyle: BlurStyle.outer
+                                            )
+                                          ]
+                                      ),
+                                      child: CustomPaint(
+                                        painter: RectPainter(),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            Expanded(
+                                              child: Padding(
+                                                padding: EdgeInsets.all(15.ss),
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text('In : $inTime',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),),
+                                                    Text('Out : $outTime',style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            Expanded(child: Container(padding: EdgeInsets.symmetric(horizontal: 10.ss,vertical: 2.ss),alignment: Alignment.bottomRight,child: Text(attendanceDate,style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),)))
+                                          ],
                                         ),
                                       ),
-                                      Expanded(child: Container(padding: EdgeInsets.symmetric(horizontal: 10.ss,vertical: 2.ss),alignment: Alignment.bottomRight,child: Text(attendanceDate,style: Theme.of(context).textTheme.bodySmall!.copyWith(fontSize: 14.fss),)))
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );}
-                        ) : Center(child: Text('No attendance available',style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Gray),),)
-                      )
-                  )
-                ],
-              ),
-            ));
+                                    ),
+                                  );}
+                            ) : Center(child: Text('No attendance available',style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Gray1),),)
+                        )
+                    )
+                  ],
+                ),
+              ));
+        }
       })
     );
   }
@@ -164,7 +170,7 @@ class _FeeScreenStates extends State<AttendanceScreen> {
             phaseShift: 1),
         child: Padding(
           padding: EdgeInsets.all(12.ss),
-          child: status == 'error' ? const Center(child: CircularProgressIndicator(color: ColorTheme.Snow_white,)):Row(
+          child: status == 'error' ? Center(child: CustCircularProgress(color: ColorTheme.Snow_white,)):Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -187,7 +193,7 @@ class _FeeScreenStates extends State<AttendanceScreen> {
                   ],
                 ),
               ),
-              if (_punchBtnLoading) Expanded(child: Center(child: SizedBox(width:25.ss,height:25.ss,child: const CircularProgressIndicator(color: ColorTheme.Snow_white,strokeWidth: 3,)))) else FlutterSwitch(
+              if (_punchBtnLoading) Expanded(child: Center(child: CustCircularProgress(color: ColorTheme.Snow_white,))) else FlutterSwitch(
                 width: 120.ss,
                 height: 40,
                 value: lastStatus == 'IN' ? true:false,
@@ -247,7 +253,7 @@ class _FeeScreenStates extends State<AttendanceScreen> {
             AwesomeDialog(context: context,
               dialogType: DialogType.success,
               animType: AnimType.bottomSlide,
-              title: '${value ? "Punch in" : "Punch out"} marked successful',
+              title: '${value ? "Punch in" : "Punch out"} successfully',
               btnOkOnPress: (){}
             ).show();
             setState(() {
@@ -284,6 +290,13 @@ class _FeeScreenStates extends State<AttendanceScreen> {
 
   Future<Map<String,dynamic>> _getAttendance() async {
     var pref = await SharedPreferences.getInstance();
+    final connectionResult = await Connectivity().checkConnectivity();
+    if(!(connectionResult.contains(ConnectivityResult.mobile)||connectionResult.contains(ConnectivityResult.wifi)||connectionResult.contains(ConnectivityResult.ethernet))){
+      if(widget.enableBack){
+        Fluttertoast.showToast(msg: 'No internet connection available');
+      }
+      return  Future.error('no internet connection');
+    }
     try{
       if(pref.containsKey(Consts.TOKEN)){
         final token = pref.getString(Consts.TOKEN)??'';

@@ -1,7 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
-
-import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
@@ -76,7 +73,7 @@ class _NewLeaveScreenState extends State<NewLeaveScreen> {
                                 hintText: 'select leave type',
                                  inputDecorationTheme:  InputDecorationTheme(
                                    border: InputBorder.none,
-
+                                   contentPadding: EdgeInsets.all(4.ss)
                                  ),
                                  width: MediaQuery.of(context).size.width,
                                   menuStyle:  MenuStyle(
@@ -97,7 +94,7 @@ class _NewLeaveScreenState extends State<NewLeaveScreen> {
                                       }
                                     }
                                   },
-                                  dropdownMenuEntries: [
+                                  dropdownMenuEntries: const [
                                 DropdownMenuEntry(value: 'Sick', label: 'Sick'),
                                 DropdownMenuEntry(value: 'Casual', label: 'Casual'),
                               ]),
@@ -147,24 +144,24 @@ class _NewLeaveScreenState extends State<NewLeaveScreen> {
                                   });
                                 },
                                 child: Container(
-                                  padding: EdgeInsets.all(8.ss),
+                                  padding: EdgeInsets.all(12.ss),
                                   decoration: BoxDecoration(
                                     border: Border.all(),
-                                    borderRadius: BorderRadius.circular(8.ss),
+                                    borderRadius: BorderRadius.circular(4.ss),
                                     // boxShadow: [BoxShadow(color: ColorTheme.Gray,blurRadius: 4.ss)]
                                   ),
                                   child:  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
                                           child: Text(
                                             _leaveData.containsKey('startDate') ? _leaveData['startDate']! :'start date',
                                             textAlign: TextAlign.center,
                                             overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                                 fontWeight: FontWeight.normal),
                                           )),
-                                      Icon(
+                                      const Icon(
                                         Icons.calendar_month_outlined,
                                       )
                                     ],
@@ -193,12 +190,12 @@ class _NewLeaveScreenState extends State<NewLeaveScreen> {
                                   });
                                 }:()=> Fluttertoast.showToast(msg: 'first select starting date then ending'),
                                 child: Container(
-                                  padding: EdgeInsets.all(8.ss),
+                                  padding: EdgeInsets.all(12.ss),
                                   decoration: BoxDecoration(
                                     // color: ColorTheme.LIGHT_RED,
                                     // boxShadow: [BoxShadow(color: ColorTheme.Gray,blurRadius: 4.ss)],
                                     borderRadius:
-                                    BorderRadius.circular(8.ss),
+                                    BorderRadius.circular(4.ss),
                                     border: Border.all(),
                                   ),
                                   child: Row(
@@ -329,8 +326,9 @@ class _NewLeaveScreenState extends State<NewLeaveScreen> {
               dialogType: DialogType.success,
               animType: AnimType.bottomSlide,
               btnOkOnPress: ()=> Navigator.of(context).pop(),
-              title: 'Successfully applied !!',
-              desc: 'your responses are recorded and send for approval..',
+              title: 'Successful',
+              desc: 'send for approval..',
+              descTextStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.normal),
               dismissOnTouchOutside: false,
               dismissOnBackKeyPress: false,
             ).show();
@@ -358,155 +356,3 @@ class _NewLeaveScreenState extends State<NewLeaveScreen> {
     }
   }
 }
-
-
-
-
-// class NewLeaveScreen extends StatefulWidget {
-//   @override
-//   State<StatefulWidget> createState() => _NewLeaveScreenState();
-// }
-//
-// class _NewLeaveScreenState extends State<NewLeaveScreen> {
-//   final ExpansionTileController _controller = ExpansionTileController();
-//   Map<String, String> _type = {};
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//         body: SafeArea(
-//           child: Padding(
-//             padding: EdgeInsets.all(14.ss),
-//             child: SingleChildScrollView(
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Column(
-//                     crossAxisAlignment: CrossAxisAlignment.start,
-//                     children: [
-//                       InkWell(
-//                           onTap: () => Navigator.of(context).pop(),
-//                           borderRadius: BorderRadius.circular(10.ss),
-//                           child: Container(
-//                               padding: EdgeInsets.all(8.ss),
-//                               decoration: BoxDecoration(
-//                                   borderRadius: BorderRadius.circular(10.ss),
-//                                   color: Colors.black12),
-//                               child: const Icon(
-//                                 Icons.keyboard_arrow_left_rounded,
-//                               ))),
-//                       Padding(
-//                         padding: EdgeInsets.symmetric(vertical: 14.ss),
-//                         child: Text(
-//                           'New Leave',
-//                           style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-//                               fontSize: 28.fss, fontWeight: FontWeight.bold),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                   Container(
-//                     width: MediaQuery.of(context).size.width,
-//                     padding: EdgeInsets.symmetric(vertical: 12.ss),
-//                     decoration: BoxDecoration(
-//                         border: Border.all(width: 1.5, color: ColorTheme.Gray1),
-//                         borderRadius: BorderRadius.all(Radius.circular(10.ss))),
-//                     child: Column(
-//                       children: [
-//                         ExpansionTile(
-//                           title: const Text('Type'),
-//                           subtitle: Text(_type.containsKey('type')
-//                               ? _type.values.first
-//                               : 'select application type'),
-//                           leading: Icon(Icons.type_specimen),
-//                           shape: RoundedRectangleBorder(
-//                               borderRadius:
-//                               BorderRadius.all(Radius.circular(10.ss))),
-//                           collapsedShape: RoundedRectangleBorder(
-//                               borderRadius:
-//                               BorderRadius.all(Radius.circular(10.ss))),
-//                           showTrailingIcon: false,
-//                           controller: _controller,
-//                           children: [
-//                             InkWell(
-//                               onTap: ()=>_toggle('type', 'Sick'),
-//                               child: Row(
-//                                 children: [
-//                                   Checkbox(
-//                                     value: _type.containsKey('type')
-//                                         ? _type.containsValue('Sick')
-//                                         : false,
-//                                     activeColor: ColorTheme.Blue,
-//                                     onChanged: (value) {_toggle('type', 'Sick');},
-//                                   ),
-//                                   const Text('Sick'),
-//                                 ],
-//                               ),
-//                             ),
-//                             InkWell(
-//                               onTap: ()=>_toggle('type', 'Casual'),
-//                               child: Row(
-//                                 children: [
-//                                   Checkbox(
-//                                       value: _type.containsKey('type')
-//                                           ? _type.containsValue('Casual')
-//                                           : false,
-//                                       activeColor: ColorTheme.Blue,
-//                                       onChanged: (value) {_toggle('type', 'Casual');}),
-//                                   const Text('Casual'),
-//                                 ],
-//                               ),
-//                             )
-//                           ],
-//                         ),
-//                         ExpansionTile(
-//                           title: const Text('Cause'),
-//
-//                           subtitle: Text(_type.containsKey('Cause')
-//                               ? _type.values.first
-//                               : 'Type here...'),
-//                           leading: Icon(Icons.edit),
-//                           shape: RoundedRectangleBorder(
-//                               borderRadius:
-//                               BorderRadius.all(Radius.circular(10.ss))),
-//                           collapsedShape: RoundedRectangleBorder(
-//                               borderRadius:
-//                               BorderRadius.all(Radius.circular(10.ss))),
-//                           showTrailingIcon: false,
-//                           children: [
-//                             TextField(
-//                               maxLines: 5,  // Allow 5 lines
-//                               decoration: InputDecoration(
-//                                 hintText: "Type something...",
-//                                 labelText: "Your Text",
-//                               ),
-//                             ),
-//                           ],
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ));
-//   }
-//
-//   _toggle(String key, String value) {
-//     setState(() {
-//       if (_type.containsKey(key)) {
-//         // Toggle between Sick and Casual leave
-//         if (_type[key] == value) {
-//           _type.remove(key); // Remove if same value is selected again
-//         } else {
-//           _type.update(key, (_) => value); // Update to new leave type
-//         }
-//       } else {
-//         _type.putIfAbsent(key, () => value); // Add the first value
-//       }
-//       _controller.collapse(); // Collapse the expansion tile after selection
-//     });
-//   }
-//
-// }

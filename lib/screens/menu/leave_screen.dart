@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:async';
 import 'dart:convert';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -8,8 +9,11 @@ import 'package:intl/intl.dart';
 import 'package:rental_app/model/consts.dart';
 import 'package:rental_app/screens/menu/new_leave_Screen.dart';
 import 'package:rental_app/utilities/color_theme.dart';
+import 'package:rental_app/widgets/cust_circular_progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
+
+import '../../utilities/alert_dialog.dart';
 
 class LeaveScreen extends StatefulWidget{
   @override
@@ -28,6 +32,7 @@ class LeaveScreenState extends State<LeaveScreen>{
   _refresh(){
     setState((){});
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,8 +75,10 @@ class LeaveScreenState extends State<LeaveScreen>{
                       _ListOfLeaves(data: _casualLeaveData,),
                       _ListOfLeaves(data: _sickLeaveData,),
                     ]);
+                  }else if(snapshot.hasError){
+                    return Center(child: Text(snapshot.error.toString(),style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Gray1),),);
                   }else{
-                    return const Center(child: CircularProgressIndicator(color: ColorTheme.Blue,),);
+                    return Center(child: CustCircularProgress(color: ColorTheme.Blue,),);
                   }
                 },
               ),
@@ -101,10 +108,14 @@ class LeaveScreenState extends State<LeaveScreen>{
     final uri = Uri.parse('https://appadmin.atharvaservices.com/api/Leave/showLeave');
     final pref = await SharedPreferences.getInstance();
     final token = pref.getString(Consts.TOKEN) ?? '';
-
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if(!(connectivityResult.contains(ConnectivityResult.wifi)||connectivityResult.contains(ConnectivityResult.mobile)||connectivityResult.contains(ConnectivityResult.ethernet))){
+        alertDialog(contextParent: context,);
+      return Future.error('no internet connection');
+    }
     if (token.isEmpty) {
       print('User token is not available');
-      return Future.error('User token is not available');
+      return Future.error('Something went wrong !!');
     }
 
     try {
@@ -129,15 +140,15 @@ class LeaveScreenState extends State<LeaveScreen>{
           return listOfGroups;
         } else {
           print('Error: ${rawData[Consts.STATUS]}');
-          return Future.error('Error fetching leave data');
+          return Future.error('Something went wrong !!');
         }
       } else {
         print('HTTP error: ${response.statusCode}');
-        return Future.error('Failed to fetch data from API');
+        return Future.error('Something went wrong !!');
       }
     } catch (exception) {
       print('Exception: $exception');
-      return Future.error('Exception occurred while fetching leave data');
+      return Future.error('Something went wrong !!');
     }
   }
 

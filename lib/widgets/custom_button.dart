@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rental_app/widgets/cust_circular_progress.dart';
 import 'package:sizing/sizing.dart';
 
 import '../utilities/color_theme.dart';
@@ -22,16 +23,7 @@ class CustomButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return isLoading
-        ? SizedBox(
-      width: 30.ss,
-          height: 30.ss,
-          child: Center(
-              child: CircularProgressIndicator(
-                color: ColorTheme.Blue,
-                strokeWidth: 3.ss,
-              ),
-            ),
-        )
+        ? CustCircularProgress(color: ColorTheme.Blue,)
         : ElevatedButton(
             onPressed: onTap,
             style: ButtonStyle(

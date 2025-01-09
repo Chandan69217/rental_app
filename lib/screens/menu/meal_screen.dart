@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:rental_app/utilities/alert_dialog.dart';
 import 'package:rental_app/utilities/color_theme.dart';
+import 'package:rental_app/widgets/cust_circular_progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
 import '../../model/consts.dart';
@@ -26,7 +30,11 @@ class _MealScreenStates extends State<MealScreen> {
     var uri = Uri.parse('https://appadmin.atharvaservices.com/api/Meal/tenantMeal');
     var pref = await SharedPreferences.getInstance();
     var token = pref.getString(Consts.TOKEN) ?? '';
-
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if(!(connectivityResult.contains(ConnectivityResult.wifi)||connectivityResult.contains(ConnectivityResult.mobile)||connectivityResult.contains(ConnectivityResult.ethernet))){
+     alertDialog(contextParent: context,);
+      return Future.error(false);
+    }
     if (token.isEmpty) {
       print('Token is empty');
       return [];
@@ -130,7 +138,7 @@ class _MealScreenStates extends State<MealScreen> {
                               builder: (context) => _VisitScreen(mealsDetails: snapshot.data![0],tenantName: _tenantName,)));
                         },
                         title: 'Breakfast',
-                        subTitle: snapshot.hasData ? 'get your breakfast between ${snapshot.data![0]['mealStartTime']} to ${snapshot.data![0]['mealEndtime']}' : '',
+                        subTitle: snapshot.hasData && snapshot.data!.isNotEmpty ? 'get your breakfast between ${snapshot.data![0]['mealStartTime']} to ${snapshot.data![0]['mealEndtime']}' : '',
                         loading: snapshot.hasData,
                         enabled: _breakfastBtnVisibility
                         //snapshot.hasData ? snapshot.data![0][Consts.STATUS] == Consts.ACTIVE ? true : false : false
@@ -144,7 +152,7 @@ class _MealScreenStates extends State<MealScreen> {
                               builder: (context) => _VisitScreen(mealsDetails: snapshot.data![1],tenantName: _tenantName,)));
                         },
                         title: 'Lunch',
-                        subTitle: snapshot.hasData ? 'get your lunch between ${snapshot.data![1]['mealStartTime']} to ${snapshot.data![1]['mealEndtime']}' : '',
+                        subTitle: snapshot.hasData && snapshot.data!.isNotEmpty? 'get your lunch between ${snapshot.data![1]['mealStartTime']} to ${snapshot.data![1]['mealEndtime']}' : '',
                         enabled:  _lunchBtnVisibility,
                         //snapshot.hasData ? snapshot.data![1][Consts.STATUS] == Consts.ACTIVE ? true : false : false,
                         loading: snapshot.hasData,
@@ -158,7 +166,7 @@ class _MealScreenStates extends State<MealScreen> {
                               builder: (context) => _VisitScreen(mealsDetails: snapshot.data![2],tenantName: _tenantName,)));
                         },
                         title: 'Dinner',
-                        subTitle: snapshot.hasData ? 'get your dinner between ${snapshot.data![2]['mealStartTime']} to ${snapshot.data![2]['mealEndtime']}' : '',
+                        subTitle: snapshot.hasData && snapshot.data!.isNotEmpty? 'get your dinner between ${snapshot.data![2]['mealStartTime']} to ${snapshot.data![2]['mealEndtime']}' : '',
                         enabled:  _dinnerBtnVisibility,
                         //snapshot.hasData ? snapshot.data![2][Consts.STATUS] == Consts.ACTIVE ? true : false : false,
                         loading: snapshot.hasData,
@@ -171,6 +179,7 @@ class _MealScreenStates extends State<MealScreen> {
             )
     );
   }
+
 }
 
 class _MealTile extends StatelessWidget {
@@ -219,21 +228,6 @@ class _MealTile extends StatelessWidget {
                     maxLines: 3,
                   ),
                 ),
-                // RichText(
-                //   text: TextSpan(
-                //     text: title,
-                //     style: Theme.of(context).textTheme.bodyMedium,
-                //     children: [
-                //       TextSpan(text: '\n'),
-                //       TextSpan(
-                //         text: subTitle,
-                //         style: Theme.of(context).textTheme.bodySmall,
-                //       ),
-                //     ],
-                //   ),
-                //   overflow: TextOverflow.ellipsis,
-                //   maxLines: 3,
-                // ),
               ],
             ),
           ),
@@ -261,9 +255,8 @@ class _MealTile extends StatelessWidget {
               child: SizedBox(
                   height: 24.ss,
                   width: 25.ss,
-                  child: const CircularProgressIndicator(
+                  child: CustCircularProgress(
                     color: ColorTheme.Blue,
-                    strokeWidth: 2,
                   ))))
         ],
       ),
@@ -337,123 +330,3 @@ class _VisitScreen extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-
-
-
-// class _FoodShowCase extends StatelessWidget{
-//   final List<String> picture;
-//   final String headline;
-//   final String dishName;
-//   final String description;
-//   final VoidCallback? onTap;
-//
-//   const _FoodShowCase({required this.picture,this.headline ='',this.dishName = '',this.description ='',this.onTap});
-//   @override
-//   Widget build(BuildContext context) {
-//     return SizedBox(
-//         width: MediaQuery.of(context).size.width,
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           mainAxisSize: MainAxisSize.min,
-//           children: [
-//             Padding(
-//               padding: EdgeInsets.only(left: 10.ss, top: 20.ss),
-//               child: RichText(
-//                   text: TextSpan(
-//                     text: headline,
-//                     style: Theme.of(context).textTheme.bodyMedium,
-//                   )),
-//             ),
-//             SizedBox(
-//               height: 10.ss,
-//             ),
-//             ConstrainedBox(
-//               constraints: BoxConstraints(maxHeight: 220.ss),
-//               child: ListView.builder(
-//                 scrollDirection:
-//                 Axis.horizontal, // Makes the ListView horizontal
-//                 itemCount: picture.length, // Number of items
-//                 shrinkWrap: true,
-//                 itemBuilder: (context, index) {
-//                   return Container(
-//                       width: 180, // Width for each item
-//                       margin: EdgeInsets.all(8.ss),
-//                       child: Column(
-//                         children: [
-//                           ClipRRect(
-//                             borderRadius:
-//                             BorderRadius.circular(10.ss),
-//                             child: Image.asset(
-//                               picture[index],
-//                               height: 150,
-//                               fit: BoxFit.cover,
-//                             ),
-//                           ),
-//                           SizedBox(
-//                             height: 4.ss,
-//                           ),
-//                           Expanded(
-//                             child: Row(
-//                               mainAxisAlignment:
-//                               MainAxisAlignment.spaceBetween,
-//                               crossAxisAlignment:
-//                               CrossAxisAlignment.start,
-//                               children: [
-//                                 Expanded(
-//                                   child: Column(
-//                                     crossAxisAlignment:
-//                                     CrossAxisAlignment.start,
-//                                     children: [
-//                                       Text(
-//                                         dishName,
-//                                         style: Theme.of(context)
-//                                             .textTheme
-//                                             .bodyMedium!
-//                                             .copyWith(fontSize: 11.fss),
-//                                         overflow: TextOverflow.ellipsis,
-//                                         maxLines: 1,
-//                                       ),
-//                                       Text(
-//                                         description,
-//                                         style: Theme.of(context)
-//                                             .textTheme
-//                                             .bodySmall!
-//                                             .copyWith(
-//                                             fontSize: 11.fss,
-//                                             fontWeight:
-//                                             FontWeight.w500),
-//                                         overflow: TextOverflow.ellipsis,
-//                                         maxLines: 2,
-//                                       ),
-//                                     ],
-//                                   ),
-//                                 ),
-//                                 InkWell(
-//                                     onTap: onTap,
-//                                     borderRadius:
-//                                     BorderRadius.circular(10),
-//                                     child: Padding(
-//                                         padding: EdgeInsets.all(10),
-//                                         child: ImageIcon(
-//                                           AssetImage(
-//                                               'assets/icons/heart_icon.webp'),
-//                                           size: 20.ss,
-//                                         )))
-//                               ],
-//                             ),
-//                           ),
-//                         ],
-//                       ));
-//                 },
-//               ),
-//             ),
-//           ],
-//         ));
-//   }
-//
-// }

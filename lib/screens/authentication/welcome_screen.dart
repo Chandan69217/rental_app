@@ -53,7 +53,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     ),
                     CustomButton(
                       onTap: () => Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(builder: (context) => LoginScreen())),
+                          MaterialPageRoute(builder: (context) => const LoginScreen())),
                       text: 'Log In',
                       backgroundColor: ColorTheme.Blue,
                       foregroundColor: ColorTheme.Snow_white,

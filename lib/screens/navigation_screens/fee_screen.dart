@@ -1,8 +1,11 @@
 import 'dart:convert';
-
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:rental_app/utilities/alert_dialog.dart';
+import 'package:rental_app/widgets/cust_circular_progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
 import '../../model/consts.dart';
@@ -31,9 +34,19 @@ class _FeeScreenStates extends State<FeeScreen> {
         'https://appadmin.atharvaservices.com/api/Fee/tenantMonthlyFee');
     var pref = await SharedPreferences.getInstance();
     var token = pref.getString(Consts.TOKEN) ?? '';
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if(!(connectivityResult.contains(ConnectivityResult.wifi)||connectivityResult.contains(ConnectivityResult.mobile)||connectivityResult.contains(ConnectivityResult.ethernet))){
+      if(widget.enableBack){
+        alertDialog(contextParent: context,enable: widget.enableBack);
+      }
+      return Future.error('no internet connection');
+    }
     if (token.isEmpty) {
       print('Token is empty');
-     return Future.error('User token is empty');
+      if(widget.enableBack){
+        alertDialog(contextParent: context,title: 'something went wrong !!');
+      }
+     return Future.error('something went wrong !!');
     }
     try {
       var response = await get(uri, headers: {
@@ -43,26 +56,38 @@ class _FeeScreenStates extends State<FeeScreen> {
 
       if (response.statusCode == 200) {
         var paymentsData = Map.from(json.decode(response.body));
-        print("Received data from network: $paymentsData");
         if (paymentsData.containsKey('payments')) {
           payment = List.from(paymentsData['payments']);
           if (payment.isEmpty) {
-            print('payment data is not present in the response body');
-            return Future.error('payment data is not present');
+            if(widget.enableBack){
+              alertDialog(contextParent: context,title: 'something went wrong !!');
+            }
+            return Future.error('something went wrong !!');
           }
           return payment;
         } else {
-          print("payment is missing in the response.");
+          if(widget.enableBack){
+            alertDialog(contextParent: context,title: 'something went wrong !!');
+          }
+          return Future.error('something went wrong !!');
         }
       }
       else {
+        alertDialog(contextParent: context,title: 'something went wrong !!');
         print(
             'Data cannot be fetched with response code: ${response.statusCode} reason: ${response.reasonPhrase}');
-       return Future.error('Data cannot be fetched with response code: ${response.statusCode} reason: ${response.reasonPhrase}');
+        if(widget.enableBack){
+          alertDialog(contextParent: context,title: 'something went wrong !!');
+        }
+        return Future.error('something went wrong !!');
       }
     } catch (e) {
+      alertDialog(contextParent: context,title: 'something went wrong !!');
       print('Error occurred during network request: $e');
-      return Future.error('Error occurred during network request: $e');
+      if(widget.enableBack){
+        alertDialog(contextParent: context,title: 'something went wrong !!');
+      }
+      return Future.error('something went wrong !!');
     }
     return payment;
   }
@@ -216,9 +241,10 @@ class _FeeScreenStates extends State<FeeScreen> {
                         ],
                       );
                     }else if(snapshot.hasError){
-                      return Center(child: Padding(padding: EdgeInsets.all(16.ss),child: Text(snapshot.error.toString()),),);
-                    }else{
-                      return Center(child: CircularProgressIndicator(color: ColorTheme.Blue,),);
+                      return Center(child: Text(snapshot.error.toString(),style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Gray1),),);
+                    }
+                    else{
+                      return Center(child: CustCircularProgress(color: ColorTheme.Blue,));
                     }
                   })
                 ),

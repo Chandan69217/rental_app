@@ -5,6 +5,7 @@ import 'package:rental_app/screens/authentication/welcome_screen.dart';
 import 'package:rental_app/screens/dashboard.dart';
 import 'package:rental_app/utilities/color_theme.dart';
 import 'package:rental_app/utilities/theme_data.dart';
+import 'package:rental_app/widgets/cust_circular_progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
 
@@ -26,14 +27,14 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<bool?> checkLoginStatus() async{
-    final prefs = await SharedPreferences.getInstance();
-    final bool? islogin = prefs.getBool(Consts.IS_LOGIN);
-    return islogin ?? false;
+    final _prefs = await SharedPreferences.getInstance();
+    final bool? _islogin = _prefs.getBool(Consts.IS_LOGIN);
+    return _islogin ?? false;
   }
 
   @override
   Widget build(BuildContext context){
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
         statusBarIconBrightness: Brightness.dark,
         statusBarColor: Colors.transparent));
     return SizingBuilder(
@@ -48,7 +49,7 @@ class _MyAppState extends State<MyApp> {
               return const WelcomeScreen();
             }
           }else{
-            return const Scaffold(body: Center(child: CircularProgressIndicator(color: ColorTheme.Blue,)));
+            return Scaffold(body: CustCircularProgress(color: ColorTheme.Blue,));
           }
         }, future: checkLoginStatus(),)
       ),

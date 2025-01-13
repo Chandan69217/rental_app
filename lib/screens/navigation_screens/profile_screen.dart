@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rental_app/model/consts.dart';
 import 'package:rental_app/screens/authentication/welcome_screen.dart';
+import 'package:rental_app/screens/menu/notification_screen.dart';
 import 'package:rental_app/screens/navigation_screens/fee_screen.dart';
 import 'package:rental_app/widgets/cust_circular_progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -101,7 +102,7 @@ class _ProfileScreenStates extends State<ProfileScreen> {
                                     _profileButtons(iconPath: 'assets/icons/payments.webp', label: 'Payments',onTap: (){},),
                                     Padding(padding: EdgeInsets.symmetric(vertical: 8.ss),
                                         child: Text('Settings',style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Blue,fontWeight: FontWeight.w600),)),
-                                    _profileButtons(iconPath: 'assets/icons/notification-bell.webp', label: 'Notifications',onTap: (){Navigator.of(context).push(MaterialPageRoute(builder: (context)=> FeeScreen(enableBack: true,)));},),
+                                    _profileButtons(iconPath: 'assets/icons/notification-bell.webp', label: 'Notifications',onTap: (){Navigator.of(context).push(MaterialPageRoute(builder: (context)=> NotificationScreen()));},),
                                     _profileButtons(iconPath: 'assets/icons/terms-and-conditions.webp', label: 'Terms & Conditions',onTap: (){},),
                                     _profileButtons(iconPath: 'assets/icons/privacy-policy.webp', label: 'Privacy Police',onTap: (){},),
                                     ListTile(

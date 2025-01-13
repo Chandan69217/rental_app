@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
 import '../../model/consts.dart';
 import '../../utilities/color_theme.dart';
+import '../../widgets/warning_message.dart';
 
 class FeeScreen extends StatefulWidget {
   final bool enableBack;
@@ -39,14 +40,20 @@ class _FeeScreenStates extends State<FeeScreen> {
       if(widget.enableBack){
         alertDialog(contextParent: context,enable: widget.enableBack);
       }
-      return Future.error('no internet connection');
+      return  Future.error({
+        'title': 'No connection',
+        'desc': 'Please check your internet connectivity and try again',
+      });
     }
     if (token.isEmpty) {
       print('Token is empty');
       if(widget.enableBack){
         alertDialog(contextParent: context,title: 'something went wrong !!');
       }
-     return Future.error('something went wrong !!');
+      return  Future.error({
+        'title': 'Something went wrong !!',
+        'desc': 'Please retry after sometime',
+      });
     }
     try {
       var response = await get(uri, headers: {
@@ -62,14 +69,20 @@ class _FeeScreenStates extends State<FeeScreen> {
             if(widget.enableBack){
               alertDialog(contextParent: context,title: 'something went wrong !!');
             }
-            return Future.error('something went wrong !!');
+            return  Future.error({
+              'title': 'Something went wrong !!',
+              'desc': 'Please retry after sometime',
+            });
           }
           return payment;
         } else {
           if(widget.enableBack){
             alertDialog(contextParent: context,title: 'something went wrong !!');
           }
-          return Future.error('something went wrong !!');
+          return  Future.error({
+            'title': 'Something went wrong !!',
+            'desc': 'Please retry after sometime',
+          });
         }
       }
       else {
@@ -79,7 +92,10 @@ class _FeeScreenStates extends State<FeeScreen> {
         if(widget.enableBack){
           alertDialog(contextParent: context,title: 'something went wrong !!');
         }
-        return Future.error('something went wrong !!');
+        return  Future.error({
+          'title': 'Something went wrong !!',
+          'desc': 'Please retry after sometime',
+        });
       }
     } catch (e) {
       alertDialog(contextParent: context,title: 'something went wrong !!');
@@ -87,9 +103,11 @@ class _FeeScreenStates extends State<FeeScreen> {
       if(widget.enableBack){
         alertDialog(contextParent: context,title: 'something went wrong !!');
       }
-      return Future.error('something went wrong !!');
+      return  Future.error({
+        'title': 'Something went wrong !!',
+        'desc': 'Please retry after sometime',
+      });
     }
-    return payment;
   }
 
 
@@ -241,7 +259,9 @@ class _FeeScreenStates extends State<FeeScreen> {
                         ],
                       );
                     }else if(snapshot.hasError){
-                      return Center(child: Text(snapshot.error.toString(),style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Gray1),),);
+                      var error = snapshot.error as Map<String,String>;
+                      return ShowWarning(titile: error['title']!,desc: error['desc']! ,onPressed:_refresh );
+                        //Center(child: Text(snapshot.error.toString(),style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Gray1),),);
                     }
                     else{
                       return Center(child: CustCircularProgress(color: ColorTheme.Blue,));
@@ -252,6 +272,11 @@ class _FeeScreenStates extends State<FeeScreen> {
             ],
           )),
     );
+  }
+
+  _refresh(){
+    setState(() {
+    });
   }
 
   _toggleSelection(int index, int amount) {

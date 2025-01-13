@@ -4,6 +4,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:rental_app/widgets/cust_circular_progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
 import '../../model/consts.dart';
@@ -166,7 +167,7 @@ class _NotificationScreenStates extends State<NotificationScreen> {
                                 }),
                           );
                         }else{
-                          return Container(padding:EdgeInsets.only(top: 20.ss),child: const Center(child: CircularProgressIndicator(color: ColorTheme.Blue,)));
+                          return Container(padding:EdgeInsets.only(top: 20.ss),child:  Center(child: CustCircularProgress(color: ColorTheme.Blue,)));
                         }
                       }
                     )

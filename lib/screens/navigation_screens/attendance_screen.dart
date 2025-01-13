@@ -13,6 +13,7 @@ import 'package:rental_app/custom_paints/rect_painter.dart';
 import 'package:rental_app/model/consts.dart';
 import 'package:rental_app/utilities/permission_handler.dart';
 import 'package:rental_app/widgets/cust_circular_progress.dart';
+import 'package:rental_app/widgets/warning_message.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizing/sizing.dart';
 import '../../custom_paints/circular_curve.dart';
@@ -47,6 +48,9 @@ class _AttendanceScreenStates extends State<AttendanceScreen> {
     _token = pref.getString(Consts.TOKEN) ?? '';
   }
 
+  _refresh(){
+    setState(() {});
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,7 +77,9 @@ class _AttendanceScreenStates extends State<AttendanceScreen> {
         bool hasData = snapshot.hasData ? true : snapshot.hasError ? false : false;
         final lastAttendance = hasData? snapshot.data!['lastAttendance'] : [];
         if(snapshot.hasError){
-            return Center(child: Text(snapshot.error.toString(),style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Gray1),),);
+          var error = snapshot.error as Map<String,String>;
+            return ShowWarning(titile: error['title']!,desc: error['desc']! ,onPressed:_refresh );
+              // Center(child: Text(snapshot.error.toString(),style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: ColorTheme.Gray1),),);
         }else{
           return SafeArea(
               child: Padding(
@@ -253,7 +259,9 @@ class _AttendanceScreenStates extends State<AttendanceScreen> {
             AwesomeDialog(context: context,
               dialogType: DialogType.success,
               animType: AnimType.bottomSlide,
-              title: '${value ? "Punch in" : "Punch out"} successfully',
+              title: 'Success',
+              desc: '${value ? "Punch in" : "Punch out"} successfully',
+              descTextStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.normal),
               btnOkOnPress: (){}
             ).show();
             setState(() {
@@ -263,7 +271,9 @@ class _AttendanceScreenStates extends State<AttendanceScreen> {
             AwesomeDialog(context: context,
                 dialogType: DialogType.error,
                 animType: AnimType.bottomSlide,
-                title: 'unable to mark your attendance',
+                title: 'Error',
+                desc: 'Something went wrong !!',
+                descTextStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.normal),
                 btnOkOnPress: (){}
             ).show();
             setState(() {
@@ -293,9 +303,12 @@ class _AttendanceScreenStates extends State<AttendanceScreen> {
     final connectionResult = await Connectivity().checkConnectivity();
     if(!(connectionResult.contains(ConnectivityResult.mobile)||connectionResult.contains(ConnectivityResult.wifi)||connectionResult.contains(ConnectivityResult.ethernet))){
       if(widget.enableBack){
-        Fluttertoast.showToast(msg: 'No internet connection available');
+        Fluttertoast.showToast(msg: 'No connection');
       }
-      return  Future.error('no internet connection');
+      return  Future.error({
+        'title': 'No connection',
+        'desc': 'Please check your internet connectivity and try again',
+      });
     }
     try{
       if(pref.containsKey(Consts.TOKEN)){
@@ -324,20 +337,31 @@ class _AttendanceScreenStates extends State<AttendanceScreen> {
             };
             return result;
           }else{
-            Future.error('rawBody_0 message : ${rawBody0['message']} rawBody_1 message ${rawBody1['message']}');
+            return  Future.error({
+              'title': 'Something went wrong !!',
+              'desc': 'Please retry after sometime',
+            });
           }
         }else{
-          Future.error('response_0 reason: ${response[0].reasonPhrase} response_1 reason: ${response[1].reasonPhrase}');
+          return  Future.error({
+            'title': 'Something went wrong !!',
+            'desc': 'Please retry after sometime',
+          });
         }
       }else{
         print('User Token Not Available');
-        return Future.error('User Token Not Available');
+        return  Future.error({
+          'title': 'Something went wrong !!',
+          'desc': 'Please retry after sometime',
+        });
       }
     }catch(exception){
       print('Exception : $exception');
-      return Future.error(exception.toString());
+      return  Future.error({
+        'title': 'Something went wrong !!',
+        'desc': 'Please retry after sometime',
+      });
     }
-    return Future.error('unable to fetch data');
   }
 
   _showDialog({required String title,required String desc,required VoidCallback? onClick}){
